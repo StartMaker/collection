@@ -51,7 +51,7 @@ class Login extends React.Component{
             if(! err ) {
                 // console.log('Received values of form: ', value);
                 delete value.remember;
-                const result = login(value, false);
+                const result = login(value);
                 result.then(resp => {
                      return resp.json()
                 }).then(json => {

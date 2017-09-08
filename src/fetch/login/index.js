@@ -3,9 +3,9 @@ import post from '../post';
 
 
 
-export default function login(body, flag, token='') {
+export default function login(body) {
     const url = '/event/login';
-    const result = post(url, body, flag, token);
+    const result = post(url, body);
     return result;
 }
 

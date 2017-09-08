@@ -10,41 +10,24 @@ class PriModify extends React.Component{
     constructor(props, context){
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-        this.state = {
-            userList: [],
-        }
     }
     componentDidMount() {
         // 挂载
-        let userList = [];
-        let data = this.props.userList;
-        if (!!data) {
-            for(let key of Object.keys(data)){
-                data[key].forEach((item, index) => {  // 对象拼接
-                    userList.push(Object.assign({}, item, {key: userList.length}))
-                })
-            }
-        }
-        this.setState({
-            userList: userList
-        })
-
     }
     // 更改权限
     changePri(text) {  
-        console.log('更变权限:', text.username);
+        this.props.changeRoleAciton(text);
     }
     // 刪除用户
-    confirm(text) {  
-      console.log('删除用户:', text.username)
-      message.success('delete successful!');
+    confirmText(text) {  
+        this.props.deleteUserAction(text);
     }
     cancel(e) {   
       console.log(e);
     }
     render(){
         return(
-           <Table dataSource={this.state.userList} 
+           <Table dataSource={this.props.userList} 
              pagination={{pageSize:6}}
              >
            <Column
@@ -72,7 +55,7 @@ class PriModify extends React.Component{
                     </Breadcrumb.Item>
                     <Breadcrumb.Item>
                         <Popconfirm title="Are you sure delete this user?"
-                        onConfirm={e=> { this.confirm(text)}} onCancel={this.cancel} okText="Yes" cancelText="No" >
+                        onConfirm={e=> { this.confirmText(text)}} onCancel={this.cancel} okText="Yes" cancelText="No" >
                         <a href="javascript:void(0)" >删除用户</a>
                         </Popconfirm>
                     </Breadcrumb.Item>

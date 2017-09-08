@@ -38,7 +38,8 @@ class PwModify extends React.Component{
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
           if (!err) {
-            console.log('Received values of form: ', values );
+            // console.log('Received values of form: ', values );
+            this.props.modifyPWAction(values);
           }
         });
     }
@@ -52,6 +53,14 @@ class PwModify extends React.Component{
          const passwordError = isFieldTouched('password') && getFieldError('password');
         return(
             <Form layout='vertical'>
+                <FormItem
+                  label='Currently User'>
+                  {getFieldDecorator('user', {
+                    rules: [{ required: false, message: 'Please input your original password!' }],
+                  })(
+                    <Input disabled prefix={<Icon type="user" style={{ fontSize: 13 }} />} type='user' placeholder={this.props.username} />
+                  )}
+                </FormItem>
                 <FormItem
                   label='original password'>
                   {getFieldDecorator('OriPassword', {

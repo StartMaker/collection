@@ -4,7 +4,7 @@ import 'es6-promise'
 
 
 export default function post( ...args ) {
-    const [ url, body, flag, token  ] = [ args[0], args[1], args[2], args[3] ];
+    const [ url, body, token  ] = [ args[0], args[1], args[2] ];
     // console.log('args',args);
     const params = JSON.stringify(body);
     // console.log(params);

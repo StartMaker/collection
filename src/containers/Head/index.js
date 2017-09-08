@@ -89,8 +89,9 @@ class Head extends React.Component{
 
             {/* 權限管理*/}
                 <PriManage visible={this.state.visible} // 弹窗是否可见 
-                onCancle={this.handleHideMode.bind(this)}
-                token={this.props.userinfo.token}/> {/* 取消 */}
+                onCancle={this.handleHideMode.bind(this)} // 取消 
+                token={this.props.userinfo.token}
+                username={this.props.userinfo.username}/> 
                 
 
             </div>

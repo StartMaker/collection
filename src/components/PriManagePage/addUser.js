@@ -23,7 +23,7 @@ class AddUser extends React.Component{
         this.setState({ confirmDirty: this.state.confirmDirty || !!value });
     }
 
-    checkPassword(rule, value, callback) {
+    checkPassword(rule, value, callback) {  // 验证确认密码输入框
         const form = this.props.form;
         if (value && value !== form.getFieldValue('password')) {
           callback('Two passwords that you enter is inconsistent!');
@@ -39,11 +39,12 @@ class AddUser extends React.Component{
         }
         callback();
     }
-    handleSubmit(e) {
+    handleSubmit(e) {   // 提交表单
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
           if (!err) {
-            console.log('Received values of form: ', Object.assign({}, values, {role:values.role.role}) );
+            console.log('Received values of form: ', Object.assign({}, values, {role:values.role.role} ));
+              this.props.addUserAction(Object.assign({}, values, {role:values.role.role}));
           }
         });
     }
@@ -53,14 +54,14 @@ class AddUser extends React.Component{
     }
     render(){
      const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
-     const userNameError = isFieldTouched('userName') && getFieldError('userName');
+     const userNameError = isFieldTouched('username') && getFieldError('username');
      const passwordError = isFieldTouched('password') && getFieldError('password');
         return(
 
             <Form layout='vertical'>
                 <FormItem
-                  label='username'>
-                  {getFieldDecorator('userName', {
+                  label='UserName'>
+                  {getFieldDecorator('username', {
                     rules: [{ required: true, message: 'Please input your username!' }],
                   })(
                     <Input prefix={<Icon type="user" style={{ fontSize: 13 }} />} placeholder="Username" />
