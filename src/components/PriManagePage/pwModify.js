@@ -20,7 +20,7 @@ class PwModify extends React.Component{
 
     checkPassword(rule, value, callback) {
         const form = this.props.form;
-        if (value && value !== form.getFieldValue('NewPassword')) {
+        if (value && value !== form.getFieldValue('newPassword')) {
           callback('Two passwords that you enter is inconsistent!');
         } else {
           callback();
@@ -63,7 +63,7 @@ class PwModify extends React.Component{
                 </FormItem>
                 <FormItem
                   label='original password'>
-                  {getFieldDecorator('OriPassword', {
+                  {getFieldDecorator('oldPassword', {
                     rules: [{ required: true, message: 'Please input your original password!' }],
                   })(
                     <Input prefix={<Icon type="lock" style={{ fontSize: 13 }} />} type='password' placeholder="original password" />
@@ -75,7 +75,7 @@ class PwModify extends React.Component{
                   hasFeedback
                   min='6'
                 >
-                  {getFieldDecorator('NewPassword', {
+                  {getFieldDecorator('newPassword', {
                     rules: [{ 
                             required: true, 
                             message: 'Please input your Password!'

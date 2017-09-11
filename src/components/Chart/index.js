@@ -2,13 +2,17 @@ import  React from 'react';
 import { Link } from 'react-router';
 import PureRenderMixin from 'react-addons-pure-render-mixin'
 
+
+// echarts 组件载入
 import echarts from 'echarts/lib/echarts';
 import 'echarts/lib/chart/line';
 import 'echarts/lib/chart/bar';
 import 'echarts/lib/component/title';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/toolbox';
+import 'echarts/lib/component/legend';
 import 'echarts/lib/component/markPoint';
+
 import './style.less';
 
 class Chart extends React.Component{
@@ -65,11 +69,12 @@ class Chart extends React.Component{
             POST.y.push(item.y);
         })
 
-        console.log('Fllow', FLLOW, 'POST', POST);
+        // console.log('Fllow', FLLOW, 'POST', POST);
 
         return {
             legend: {
-                left:"2%",
+                right:"15%",
+                top: '2%',
                 data:['发帖量','跟帖量'],
                 show : true
             },
@@ -77,7 +82,7 @@ class Chart extends React.Component{
                 top:"40px",
                 bottom:'10%',
                 left:'3%',
-                right:'3%'
+                right:'1%'
             },
             tooltip: {
                 show:true,
@@ -141,8 +146,10 @@ class Chart extends React.Component{
                 },
                 name:"跟帖量",
                 type:'line',
-                lineStyle:{normal:{color: '#145861',width:2} },
-                itemStyle:{normal:{color: '#004c5d'}},
+                // lineStyle:{normal:{color: '#145861',width:2} },
+                // itemStyle:{normal:{color: '#004c5d'}},
+                lineStyle:{normal:{color: '#3eacfa',width:2} },
+                itemStyle:{normal:{color: '#129CFF'}},
                 data: FLLOW.y,
                 markLine: {
                     data: [
@@ -154,13 +161,14 @@ class Chart extends React.Component{
                         alpha :0.5,
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
                             offset: 1,
-                            color: '#f2f5f2'
+                            color: '#d8edfc'
                         }, {
                             offset: 0.5,
-                            color: '#65c8d0'
+                            color: '#7ecef4'
                         },{
                             offset:0,
-                            color: '#004c5d'
+                            // color: '#004c5d'
+                            color: '#2ca5fb'
                         }
                         ])
                     }
@@ -173,8 +181,10 @@ class Chart extends React.Component{
                 },
                 name:"发帖量",
                 type:'line',
-                lineStyle:{normal:{color: '#9c9c9c',width:2} },
-                itemStyle:{normal:{color: '#572015'}},
+                // lineStyle:{normal:{color: '#9c9c9c',width:2} },
+                // itemStyle:{normal:{color: '#572015'}},
+                lineStyle:{normal:{color: '#aaa',width:2} },
+                itemStyle:{normal:{color: '#999'}},
                 data: POST.y,
                 markLine: {
                     data: [
@@ -183,20 +193,20 @@ class Chart extends React.Component{
                 },
                 areaStyle: {
                     normal: {
-                        alpha :0.2,
+                        alpha :1,
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
                             offset: 1,
                             color: '#fff'
                         },{
                             offset: 0.75,
-                            color: '#ccc'
+                            color: '#e5e5e5'
                         }, {
                             offset: 0.3,
-                            color: '#999'                            
+                            color: '#c9c9c9'                            
                         },
                             {
                             offset: 0,
-                            color: '#7e7e7e'
+                            color: '#aaa'
                         }])
                     }
                 }
@@ -206,7 +216,7 @@ class Chart extends React.Component{
     render(){
         return(
             <div>
-            <div ref='chartContainer' style={{width: '100%', height: '256px'}}></div>
+            <div id='chart-container' ref='chartContainer' style={{width: '100%', height: '256px'}}></div>
             </div>
 
         )

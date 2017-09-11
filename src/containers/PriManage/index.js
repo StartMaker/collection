@@ -118,7 +118,27 @@ class PriManage extends React.Component{
     }
     // 修改密码
     modifyPWAction(modifyPWObj) {
-        console.log('modifyPWObj ', modifyPWObj);
+        delete modifyPWObj.user;
+        delete modifyPWObj.confirm;
+        let { token } = this.props;
+        let result = modifyPW(modifyPWObj, token);
+        result.then(resp => {
+            if (resp.ok) {
+                return resp.text();
+            } else {
+                message.error('服务器内部发生错误');
+            }
+        }).then(text => {
+            if (text==='原始密码不匹配，请重新输入原始密码') {
+                message.error(text);
+            } else {
+                message.success('你的密码已经修改成功！');
+            }
+        }).catch(ex => {
+            if (__DEV__) {
+                console.log('修改密码时发生错误 ', ex.message);
+            }
+        })
     }
     render(){
 

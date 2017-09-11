@@ -53,18 +53,21 @@ class Login extends React.Component{
                 delete value.remember;
                 const result = login(value);
                 result.then(resp => {
-                     return resp.json()
-                }).then(json => {
-                    const { role, token, username } = json;
+                    console.log('resp', resp);
+                    if (resp.ok) {
+                        return resp.json();
+                    }
+                }).then(data => {
+                    const { role, token, username } = data;
                     this.props.userInfoAction.login({
                         role: role,
                         token: token,
                         username: username
                     })
-                hashHistory.push('/ana');
+                    hashHistory.push('/ana');
                 }).catch(ex =>{
-                    console.log('error', ex.message);
                     message.error('用戶名或者密码输入错误');
+                    // console.log('登录发生错误', ex.message);
                 })
             }
         })
