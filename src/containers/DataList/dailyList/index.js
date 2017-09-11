@@ -1,7 +1,7 @@
 import  React from 'react';
 import { Link } from 'react-router';
 import PureRenderMixin from 'react-addons-pure-render-mixin'
-import { message, Popconfirm, Icon  } from 'antd';
+import { message, Popconfirm, Icon, Modal  } from 'antd';
 
 import TableWrap from '../../../components/TableWrap';
 import getDailyDataList from '../../../fetch/dailyDataList';
@@ -25,6 +25,7 @@ class DailyDataList extends React.Component{
         this.state = {
             data: [],
             sumPage: 0,
+            visible: false
         };
         // 表头
         this.columns = [{
@@ -53,7 +54,7 @@ class DailyDataList extends React.Component{
             dataIndex: 'postType',
             className: 'column-font',
         },{
-            title: '最新更贴时间',
+            title: '最后更贴时间',
             dataIndex: 'lastFollowTime',
             className: 'column-font',
         },{
@@ -70,7 +71,7 @@ class DailyDataList extends React.Component{
             className: 'column-font',
             render: (text, record, index) => {
                 return (
-                    <Icon type='edit' onClick={e => {this.handleClickAction(record)} } />
+                    <Icon type='edit' className='table-edit-icon' onClick={e => {this.handleClickAction(record)} } />
                 )
             }
         }]
@@ -110,6 +111,7 @@ class DailyDataList extends React.Component{
     }
     // 获取指定页数的数据
     getDataListByPage(page, more=0) {
+        //  从缓存中读取数据
         if (!!this.checkCache(page)) {
             this.setState({
                 data: cacheData[this.checkCache(page)].json
@@ -117,6 +119,7 @@ class DailyDataList extends React.Component{
             console.log('cache');
             return;
         }
+        // fetch
         let { token } = this.props;
         let result = getDailyDataList({
             url: page,
@@ -148,22 +151,43 @@ class DailyDataList extends React.Component{
             }
         })
     }
-    // 修改表单
-    handleClickAction(record){
-        console.log(record);
-    } 
     // 换页
     otherPageAction(page){
         this.getDataListByPage(page);
     }
-
+    // 修改表单
+    handleClickAction(record){
+        console.log(record);
+        this.setState({
+            visible: true
+        })
+    } 
+    handleConnectAction() {
+        console.log('connetion');
+        this.setState({
+            visible: false
+        })
+    }
+    handleModalCancelAction() {
+        console.log('cancel');
+        this.setState({
+            visible: false
+        })
+    }
     render(){
         return(
             <div id='tableWrap' className='container-flex'>
+                <p className='section-header'>全部舆情事件</p>
                 <TableWrap
                 {...this.state}
                 columns={this.columns}
                 clickOtherPageAction={this.otherPageAction.bind(this)}/>
+                <Modal 
+                 visible={this.state.visible}
+                 title='带归集事件'
+                 onOk={this.handleConnectAction.bind(this) }
+                 onCancel={this.handleModalCancelAction.bind(this)}
+                />
             </div>
 
         )

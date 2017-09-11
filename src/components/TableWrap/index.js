@@ -39,6 +39,7 @@ class TableWrap extends React.Component{
         return(
             <div>
                 <Table
+                className='table-style'
                  pagination={{pageSize: 5,
                     total: sumPage*5,
                     showQuickJumper: true}}
