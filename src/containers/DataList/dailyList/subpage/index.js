@@ -1,63 +1,79 @@
 import  React from 'react';
 import { Link } from 'react-router';
 import PureRenderMixin from 'react-addons-pure-render-mixin'
-import { Input, Icon  } from 'antd';
-
+import { Form, Icon, Input, Button, Table } from 'antd';
 import './style.less';
 
-class  EditableCell extends React.Component{
+import EditableInput from '../../../../components/EditableInput';
+
+const FormItem = Form.Item;
+// const 
+
+class CollectionWrap extends React.Component{
     constructor(props, context){
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-        this.state = {
-            ediable: this.props.ediable ||  false,  // 是否处在编辑状态
-            value: this.props.value 
-        }
-    }
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.editable !== this.state.editable) {
-          this.setState({ editable: nextProps.editable });
-          if (nextProps.editable) {
-            this.cacheValue = this.state.value;
+        this.columns = [{
+          title: '主题',
+          dataIndex: 'theme'
+        },{
+          title: '主要观点',
+          dataIndex: 'mainView',
+          width: '45%',
+          render: (text, record, index) =>{ 
+            console.log('text, record, index', text, record, index);
+            return (
+            <EditableInput  
+            value={text}
+            onChange={this.handleChange} />
+            )
           }
-        }
-        if (nextProps.status && nextProps.status !== this.props.status) {
-          if (nextProps.status === 'save') {
-            this.props.onChange(this.state.value);
-          } else if (nextProps.status === 'cancel') {
-            this.setState({ value: this.cacheValue });
-            this.props.onChange(this.cacheValue);
-          }
-        }
+        },{
+          title: '更贴量',
+          dataIndex: 'followCount'
+        },{
+          title: '类别',
+          dataIndex: 'postType',
+          width: '20%',
+          render: (text, record, index) => (
+            <EditableInput  
+            value={text}
+            onChange={this.handleChange} />
+            )
+        },{
+          title: '发帖时间',
+          dataIndex: 'postTime'
+        },{
+          title: '来源',
+          dataIndex: 'source'
+        }]
     }
-    shouldComponentUpdate(nextProps, nextState) {
-        return nextProps.editable !== this.state.editable ||
-               nextState.value !== this.state.value;
+    handleSubmit(value='') {
+      console.log(' submit the form ', value);
     }
-    handleChange(e) {
-        const value = e.target.value;
-        this.setState({ value });
+    handleChange(e){
+      console.log(e);
     }
-    render() {
-    const { value, editable } = this.state;
-    return (
-      <div>
-        {
-          editable ?
+    render(){
+       const { getFieldDecorator } = this.props.form;
+       const { theme, mainView, source, postType, followCount, postTime } = this.props.data;
+       const data =  this.props.data;
+        return(
             <div>
-              <Input
-                value={value}
-                onChange={e => this.handleChange(e)}
-              />
-            </div>
-            :
-            <div className="editable-row-text">
-              {value.toString() || ' '}
-            </div>
-        }
-      </div>
-    );
-  }
-}
+            <Form onSubmit={this.handleSubmit.bind(this)}>
+            <Table 
+            size="small"
+            pagination={false}
+            bordered
+            dataSource={data}
+            columns={this.columns}>
 
-export default EditableCell ;
+            </Table>
+            </Form>
+            </div>
+
+        )
+    }
+}
+const Collection = Form.create()(CollectionWrap);
+export default Collection;

@@ -10,7 +10,7 @@ import getDailyDataSumPage from '../../../fetch/sumPage/dailyPage';
 import * as fetchType from '../../../constants/fetchType';
 
 
-import EditableCell from './subpage';
+import Collection from './subpage';
 import format from '../../DataExhibition/subpage/format'
 
 import './style.less';
@@ -23,9 +23,10 @@ class DailyDataList extends React.Component{
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
         this.state = {
-            data: [],
+            data: [],  
             sumPage: 0,
-            visible: false
+            visible: false,
+            currentCowData: {}
         };
         // 表头
         this.columns = [{
@@ -132,7 +133,7 @@ class DailyDataList extends React.Component{
                 return resp.json()
             }
         }).then(json => {
-            console.log('json', json);
+            // console.log('json', json);
             cacheData.push({
                 page,
                 json,
@@ -144,7 +145,7 @@ class DailyDataList extends React.Component{
             this.setState({
                 data: json
             })
-            console.log('fetch', cacheData);
+            // console.log('fetch', cacheData);
         }).catch(ex => {
             if (__DEV__) {
                 console.log('获取列表数据出错', ex.message);
@@ -157,9 +158,10 @@ class DailyDataList extends React.Component{
     }
     // 修改表单
     handleClickAction(record){
-        console.log(record);
+        // console.log(record);
         this.setState({
-            visible: true
+            visible: true,
+            currentCowData: record
         })
     } 
     handleConnectAction() {
@@ -183,11 +185,14 @@ class DailyDataList extends React.Component{
                 columns={this.columns}
                 clickOtherPageAction={this.otherPageAction.bind(this)}/>
                 <Modal 
+                 width='935px'
                  visible={this.state.visible}
-                 title='带归集事件'
+                 title='待归集事件'
                  onOk={this.handleConnectAction.bind(this) }
                  onCancel={this.handleModalCancelAction.bind(this)}
-                />
+                 >
+                 <Collection data={[this.state.currentCowData]} />
+                 </Modal>
             </div>
 
         )
