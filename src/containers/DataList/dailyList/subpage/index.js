@@ -1,18 +1,24 @@
 import  React from 'react';
 import { Link } from 'react-router';
 import PureRenderMixin from 'react-addons-pure-render-mixin'
-import { Form, Icon, Input, Button, Table } from 'antd';
+import {  Icon, Input, Button, Table, message } from 'antd';
 import './style.less';
 
 import EditableInput from '../../../../components/EditableInput';
 
-const FormItem = Form.Item;
 // const 
-
-class CollectionWrap extends React.Component{
+// var initData = [];
+class Collection extends React.Component{
     constructor(props, context){
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+         this.state= {
+            mainView: '',
+            postType: '',
+            id: '',
+            connectable: true,
+            loading: false
+         }
         this.columns = [{
           title: '主题',
           dataIndex: 'theme'
@@ -21,11 +27,13 @@ class CollectionWrap extends React.Component{
           dataIndex: 'mainView',
           width: '45%',
           render: (text, record, index) =>{ 
-            console.log('text, record, index', text, record, index);
+            // console.log('text, record, index', text, record, index);
+            // const initMainView = text;
+            // this.initDataAction('mainView', text);
             return (
             <EditableInput  
             value={text}
-            onChange={this.handleChange} />
+            onChange={this.handleChangeType.bind(this)} />
             )
           }
         },{
@@ -35,11 +43,15 @@ class CollectionWrap extends React.Component{
           title: '类别',
           dataIndex: 'postType',
           width: '20%',
-          render: (text, record, index) => (
+          render: (text, record, index) => {
+            // const initPostType = text; 
+            // this.initDataAction('postType', text);
+            return (
             <EditableInput  
             value={text}
-            onChange={this.handleChange} />
+            onChange={this.handleChangeMainView.bind(this)} />
             )
+          }
         },{
           title: '发帖时间',
           dataIndex: 'postTime'
@@ -48,32 +60,91 @@ class CollectionWrap extends React.Component{
           dataIndex: 'source'
         }]
     }
-    handleSubmit(value='') {
-      console.log(' submit the form ', value);
+    // initDataAction(key, value) {
+    //     initData.length > 1 ? " " : initData.push({ [ key ]: value}); // es6 对象变量名拓展
+    // }
+    //  初始化state
+    initState() {  
+        const { mainView, postType, id } = this.props.data[0];
+        this.setState({
+            mainView,
+            postType,
+            id
+        })  
     }
-    handleChange(e){
-      console.log(e);
+    // 第一次挂载时加载初始化state
+    componentDidMount() {  
+        this.initState();
+    }
+    // 每次重新渲染都初始化state
+    componentDidUpdate() { 
+        this.initState();
+    }
+    // 每次postType改变时就记录
+    handleChangeType(postType) {
+      this.setState({postType});
+
+        this.setState({ // 允许归集
+            connectable: false
+        })
+    }
+    // 每次mainView改变时就记录
+    handleChangeMainView(mainView){
+      this.setState({mainView});
+
+      this.setState({ // 允许归集
+            connectable: false
+        })
+    }
+    // 隐藏弹窗
+    handleCancelAction() {  
+      this.props.handleCancel()
+    }
+    // 归集
+    handleConnectionAction() {  
+      this.setState({
+        loading: true
+      });
+      const { mainView, postType, id } = this.state; 
+      this.props.handleConnection({
+        mainView,
+        postType,
+        id
+      });
+
+      
+        // this.handleCancelAction();
+    }
+    componentWillUpdate(nextProps, nextState) {
+      if (this.props.data !== nextProps.data) {
+        this.setState({
+            connectable: true,
+        })
+      }
     }
     render(){
-       const { getFieldDecorator } = this.props.form;
        const { theme, mainView, source, postType, followCount, postTime } = this.props.data;
        const data =  this.props.data;
         return(
             <div>
-            <Form onSubmit={this.handleSubmit.bind(this)}>
             <Table 
             size="small"
             pagination={false}
             bordered
             dataSource={data}
             columns={this.columns}>
-
             </Table>
-            </Form>
+            <div className='connect-btn-container'>
+                <Button onClick={this.handleCancelAction.bind(this)}>取消</Button>
+                <Button 
+                    loading={this.props.loading} 
+                    type='primary' 
+                    disabled={this.state.connectable} 
+                    onClick={this.handleConnectionAction.bind(this)}>归集</Button>
+            </div>
             </div>
 
         )
     }
 }
-const Collection = Form.create()(CollectionWrap);
 export default Collection;

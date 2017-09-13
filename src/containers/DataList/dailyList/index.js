@@ -6,6 +6,7 @@ import { message, Popconfirm, Icon, Modal  } from 'antd';
 import TableWrap from '../../../components/TableWrap';
 import getDailyDataList from '../../../fetch/dailyDataList';
 import getDailyDataSumPage from '../../../fetch/sumPage/dailyPage';
+import collect from '../../../fetch/collect';
 
 import * as fetchType from '../../../constants/fetchType';
 
@@ -26,7 +27,8 @@ class DailyDataList extends React.Component{
             data: [],  
             sumPage: 0,
             visible: false,
-            currentCowData: {}
+            currentCowData: {},
+            loading: false
         };
         // 表头
         this.columns = [{
@@ -176,6 +178,47 @@ class DailyDataList extends React.Component{
             visible: false
         })
     }
+    componentWillUpdate(nextProps, nextState) {
+        if (nextState.currentCowData !== this.state.currentCowData) {
+            this.setState({
+                loading: false
+            })        
+        }
+    }
+    // 归集
+    handleConnectionAction(info) {
+        const { user, token } = this.props;
+        const id = info.id;
+        // let params = {};
+        delete info.id;
+        // console.log(Object.assign({}, info, {recorder: user} ));
+        // params.body = Object.assign({}, info, {recorder: user} );
+        // params.url = id;
+        // console.log(params);
+        this.setState({
+            loading: true
+        })
+        let result = collect({
+            url: id,
+            body: Object.assign({}, info, {recorder: user} )
+        }, token, fetchType.FETCH_TYPE_POST_URL2PARAMS );
+        // 归集结果
+        result.then(resp => {
+            if (resp.ok) {
+                setTimeout(() => {
+                    this.setState({
+                        loading: false
+                    })
+                }, 300)
+            } else {
+                message.error('归集失败！');
+            }
+        }).catch(ex =>{
+            if (__DEV__) {
+                console.log('服务器内部错误', ex.message);
+            }
+        })
+    }
     render(){
         return(
             <div id='tableWrap' className='container-flex'>
@@ -185,13 +228,18 @@ class DailyDataList extends React.Component{
                 columns={this.columns}
                 clickOtherPageAction={this.otherPageAction.bind(this)}/>
                 <Modal 
+                 footer={null}
                  width='935px'
                  visible={this.state.visible}
                  title='待归集事件'
                  onOk={this.handleConnectAction.bind(this) }
                  onCancel={this.handleModalCancelAction.bind(this)}
                  >
-                 <Collection data={[this.state.currentCowData]} />
+                 <Collection 
+                    loading= {this.state.loading}
+                    data={[this.state.currentCowData]}
+                    handleCancel={this.handleModalCancelAction.bind(this)}
+                    handleConnection={this.handleConnectionAction.bind(this)} />
                  </Modal>
             </div>
 

@@ -2,7 +2,7 @@
 * @Author: fxy
 * @Date:   2017-09-12 13:33:18
 * @Last Modified by:   anchen
-* @Last Modified time: 2017-09-12 17:35:27
+* @Last Modified time: 2017-09-13 16:43:07
 */
 
 import  React from 'react';
@@ -17,12 +17,13 @@ class EditableInput extends React.Component{
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
         this.state = {
-            value: this.props.value,
+            value: " ",
             ediable: false
         }
     }
     handleChange(e) {
-        const value = e.targe.value;
+        const value = e.target.value;
+        console.log('value', value);
         this.setState({value})
     }
     check() {
@@ -34,10 +35,24 @@ class EditableInput extends React.Component{
     edit() {
         this.setState({ediable: true})
     }
-    componentDidUpdate() {   // 开门
+    componentWillMount() {  
         this.setState({
             value: this.props.value
         })
+    }
+    // componentDidUpdate() {
+    //     this.setState({
+    //         value: this.props.value
+    //     })
+    // }
+    componentWillUpdate(nextProps, nextState) {   
+        // console.log('nextProps', nextProps, 'nextState', nextState );
+        if(nextProps.value !== this.props.value) {
+            this.setState({
+                value: nextProps.value,
+                ediable: false
+            })
+        }
     }
     render(){
         const { value, ediable } = this.state;

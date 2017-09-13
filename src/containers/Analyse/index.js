@@ -43,7 +43,7 @@ class Analyse extends React.Component{
             <div>
                 <Header user= { username } role={ role } selectedKeys='analyse'/> { /* 头部 */} 
                 <DataExhibition tableType='dailyEvent' token={this.props.userinfo.token}/>  { /* 图表 */}
-                <DailyDataList token={this.props.userinfo.token}/>  { /*  列表展示  */}
+                <DailyDataList token={this.props.userinfo.token} user= { username }/>  { /*  列表展示  */}
             </div>
         )
     }

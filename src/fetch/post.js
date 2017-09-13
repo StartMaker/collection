@@ -9,16 +9,33 @@ export default function post( ...args ) {
     const params = JSON.stringify(body);
     // console.log(params);
     let proToken = 'Bearer ' + token;
-    var result = fetch(url, {
+    var result = null ;
+    let optionsJSON = {
         method: 'POST',
         credentials: 'include',
         headers: {
             'Accept': 'application/json, text/plain, */*',
             'Content-Type': 'application/json',
             'Authorization': proToken
-        },
-        body: params
-    });
+        };
+
+    let options = {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Authorization': proToken
+        };
+
+    if (!!body.isJSON) {
+        result = fetch(url, optionsJSON ,
+            body: params
+        });
+    } else {
+        result = fetch(url, options ,
+            body: params
+        });
+    }
 
     return result
 }
