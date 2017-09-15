@@ -35,7 +35,6 @@ class DailyDataList extends React.Component{
             title: '主题',
             dataIndex: 'theme',
             width: '20%',
-            className: 'column-font',
             render: (text, record, index) => {
                 return (
                     <a href={record.url}>{record.theme}</a>
@@ -46,36 +45,31 @@ class DailyDataList extends React.Component{
             dataIndex: 'mainView',
             key: 'id',
             width: '35%',
-            className: 'column-font'
+            className: 'column-font',
         },{
             title: '更贴量',
             dataIndex: 'followCount',
-            className: 'column-font',
-
         },{
             title: '类别',    // 可修改
             dataIndex: 'postType',
-            className: 'column-font',
         },{
             title: '最后更贴时间',
             dataIndex: 'lastFollowTime',
-            className: 'column-font',
         },{
             title: '发帖时间',
             dataIndex: 'postTime',
-            className: 'column-font',
         },{
             title: '来源',
             dataIndex: 'source',
-            className: 'column-font',
         },{
-            title: '操作',
+            title: '归集',
             dataIndex: 'operation',
-            className: 'column-font',
             render: (text, record, index) => {
-                return (
-                    <Icon type='edit' className='table-edit-icon' onClick={e => {this.handleClickAction(record)} } />
-                )
+                if (!!!record.collectionStatus) {
+                    return (       
+                        <Icon type='edit' className='table-edit-icon' onClick={e => {this.handleClickAction(record)} } />
+                    )
+                }
             }
         }]
 
@@ -84,6 +78,13 @@ class DailyDataList extends React.Component{
         this.getDataListByPage(1);
         this.getDailyDataSumPageAction();
     }
+    componentWillMount() {
+        if(!!!this.state.data) {
+            this.setState({
+                loading: true
+            })
+        }
+    }   
     // 获取总页数
     getDailyDataSumPageAction(more=0) {
         let { token } = this.props;
@@ -122,6 +123,9 @@ class DailyDataList extends React.Component{
             console.log('cache');
             return;
         }
+        this.setState({ // 加载中
+            loading: true
+        })
         // fetch
         let { token } = this.props;
         let result = getDailyDataList({
@@ -130,6 +134,7 @@ class DailyDataList extends React.Component{
                 more: more
             }
         }, token, fetchType.FETCH_TYPE_GET_URL2PARAMS);
+        // 处理返回的promise对象
         result.then(resp => {
             if (resp.ok) {
                 return resp.json()
@@ -145,7 +150,8 @@ class DailyDataList extends React.Component{
                 item.postTime = format(item.postTime, 'yyyy-MM-dd mm:ss');
             })
             this.setState({
-                data: json
+                data: json,  // 保存数据
+                loading: false  // 结束加载
             })
             // console.log('fetch', cacheData);
         }).catch(ex => {
@@ -189,29 +195,28 @@ class DailyDataList extends React.Component{
     handleConnectionAction(info) {
         const { user, token } = this.props;
         const id = info.id;
-        // let params = {};
         delete info.id;
-        // console.log(Object.assign({}, info, {recorder: user} ));
-        // params.body = Object.assign({}, info, {recorder: user} );
-        // params.url = id;
-        // console.log(params);
+
         this.setState({
             loading: true
         })
         let result = collect({
             url: id,
-            body: Object.assign({}, info, {recorder: user} )
+            body: Object.assign({}, {recorder: user}, info )
         }, token, fetchType.FETCH_TYPE_POST_URL2PARAMS );
         // 归集结果
         result.then(resp => {
-            if (resp.ok) {
-                setTimeout(() => {
-                    this.setState({
-                        loading: false
-                    })
-                }, 300)
+            setTimeout(() => {
+                this.setState({
+                    loading: false
+                })
+            }, 300)
+            return resp.text();
+        }).then(text =>{
+            if (text=== '归集成功') {
+                message.success('归集成功！');
             } else {
-                message.error('归集失败！');
+                message.error(`归集失败！${text}`);
             }
         }).catch(ex =>{
             if (__DEV__) {
@@ -227,6 +232,7 @@ class DailyDataList extends React.Component{
                 {...this.state}
                 columns={this.columns}
                 clickOtherPageAction={this.otherPageAction.bind(this)}/>
+
                 <Modal 
                  footer={null}
                  width='935px'
@@ -235,6 +241,7 @@ class DailyDataList extends React.Component{
                  onOk={this.handleConnectAction.bind(this) }
                  onCancel={this.handleModalCancelAction.bind(this)}
                  >
+
                  <Collection 
                     loading= {this.state.loading}
                     data={[this.state.currentCowData]}

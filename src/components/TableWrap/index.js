@@ -9,31 +9,14 @@ class TableWrap extends React.Component{
     constructor(props, context){
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-        this.state = {
-            loading: true
-        }
-    }
-    componentDidMount(){
-        this.isLoading();
-    }
-    componentDidUpdate() {
-        this.isLoading();
     }
     handleTableChange(pagination, filters, sorter) {
         console.log('请求页数', pagination.current);
         this.props.clickOtherPageAction(pagination.current);
     }
-    isLoading() {
-        if (!! this.props.data) {
-            this.setState({
-                loading: false
-            })
-        } else {
-            this.setState({
-                loading: true
-            })
-        }
-    }
+    // componentWillUpdate(nextProps, nextState) {
+    //     if (nextProps) {};
+    // }
     render(){
         const { columns, data, sumPage, title } = this.props; 
         return(
@@ -45,7 +28,7 @@ class TableWrap extends React.Component{
                     showQuickJumper: true}}
                  columns={columns}
                  dataSource={data}
-                 loading={this.state.loading}
+                 loading={this.props.loading}
                  onChange={this.handleTableChange.bind(this)}/> 
             </div>
         )

@@ -153,17 +153,17 @@ class PriManage extends React.Component{
                 <Tabs style={{height: '420px',width: '580px'}}
                 onChange={e => { this.changeTab(e)} }
                 tabPosition='left'>
-                    <TabPane tab={<span><Icon type="usergroup-add" />添加新用户</span>} key='1'> 
+                    <TabPane tab={<span><Icon type="usergroup-add" />Add New User</span>} key='1'> 
                         <AddUser addUserAction={this.addUserAction.bind(this)}/>
                     </TabPane>
-                    <TabPane tab={<span><Icon type="schedule" />权限修改</span>} key='2'>
+                    <TabPane tab={<span><Icon type="schedule" />Privilege Modify </span>} key='2'>
                         <PriModify 
                          userList={this.state.userList} 
                          deleteUserAction={this.deleteUserAction.bind(this)}
                          changeRoleAciton={this.changeRoleAciton.bind(this)} />
 
                     </TabPane>
-                    <TabPane tab={<span><Icon type="edit" />修改密码</span>} key='3'>
+                    <TabPane tab={<span><Icon type="edit" />Reset Password</span>} key='3'>
                         <PwModify 
                          username={this.props.username}
                          modifyPWAction={this.modifyPWAction.bind(this)}/>
