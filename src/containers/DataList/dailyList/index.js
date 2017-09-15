@@ -24,6 +24,7 @@ class DailyDataList extends React.Component{
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
         this.state = {
+            currentPage: 1,
             data: [],  
             sumPage: 0,
             visible: false,
@@ -103,27 +104,55 @@ class DailyDataList extends React.Component{
             console.log(ex.message);
         })
     }
-    // 判断缓存中是否有当前请求数据 返回缓存位置，否则返回0
+    // 判断缓存中是否有当前请求数据 返回缓存位置，否则返回-1
     checkCache(page) {
-        let index = 0;
+        let index = -1;
         cacheData.forEach((item, itemIndex) => {
             if (item.page === page) {
                 index = itemIndex;
+                console.log('cache数组位置：', index);
             }
         })
         return index;
     }
+    // 将fetch到的数据加入缓存 相同页数覆盖
+    pushCache(page, json) {
+        let isIn = false;
+        // 覆盖相同页码的数据
+        cacheData=cacheData.map((item, index) => {
+            if (item.page != page){
+                return item
+            } else {
+                isIn = true;
+                console.log('更新缓存');
+                return {
+                    page: item.page, 
+                    json
+                }
+            }
+        })
+        // 推入缓存
+        if (!isIn) {
+            cacheData.push({
+                page,
+                json,
+            })
+        }
+    }
     // 获取指定页数的数据
-    getDataListByPage(page, more=0) {
+    getDataListByPage(page, more=0, refresh=false) {
         //  从缓存中读取数据
-        if (!!this.checkCache(page)) {
+        let cacheIndex = this.checkCache(page);
+        if (cacheIndex >= 0 && !refresh) {
             this.setState({
-                data: cacheData[this.checkCache(page)].json
+                currentPage: page,
+                data: cacheData[cacheIndex].json
             })
             console.log('cache');
             return;
         }
-        this.setState({ // 加载中
+        // 加载中
+        this.setState({ 
             loading: true
         })
         // fetch
@@ -140,23 +169,22 @@ class DailyDataList extends React.Component{
                 return resp.json()
             }
         }).then(json => {
-            // console.log('json', json);
-            cacheData.push({
-                page,
-                json,
-            })
+            // 格式化时间
             json.map((item, index) => {
-                item.lastFollowTime = format(item.lastFollowTime, 'yyyy-MM-dd mm:ss');
-                item.postTime = format(item.postTime, 'yyyy-MM-dd mm:ss');
+                item.lastFollowTime = format(item.lastFollowTime, 'yyyy-MM-dd hh:mm');
+                item.postTime = format(item.postTime, 'yyyy-MM-dd hh:mm');
             })
+             // 推入缓存
+            this.pushCache(page,json); 
+            // 结束加载 保存数据
             this.setState({
-                data: json,  // 保存数据
-                loading: false  // 结束加载
+                currentPage: page,
+                data: json, 
+                loading: false 
             })
-            // console.log('fetch', cacheData);
         }).catch(ex => {
+            console.log('获取列表数据出错', ex.message);
             if (__DEV__) {
-                console.log('获取列表数据出错', ex.message);
             }
         })
     }
@@ -215,12 +243,13 @@ class DailyDataList extends React.Component{
         }).then(text =>{
             if (text=== '归集成功') {
                 message.success('归集成功！');
+                this.getDataListByPage(this.state.currentPage, 0, true);
             } else {
                 message.error(`归集失败！${text}`);
             }
         }).catch(ex =>{
-            if (__DEV__) {
                 console.log('服务器内部错误', ex.message);
+            if (__DEV__) {
             }
         })
     }
@@ -241,7 +270,7 @@ class DailyDataList extends React.Component{
                  onOk={this.handleConnectAction.bind(this) }
                  onCancel={this.handleModalCancelAction.bind(this)}
                  >
-
+                     { /* 归集 */} 
                  <Collection 
                     loading= {this.state.loading}
                     data={[this.state.currentCowData]}

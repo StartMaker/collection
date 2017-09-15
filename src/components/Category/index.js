@@ -20,7 +20,7 @@ class Category extends React.Component{
                 selectedKeys={[this.props.current]} 
                 theme='light'
                  style={{ lineHeight: '64px'}}>
-                  <Menu.Item key='analyse'>舆情监测</Menu.Item>
+                  <Menu.Item key='ana'>舆情监测</Menu.Item>
                   <Menu.Item key='handle'>舆情处置</Menu.Item>
                   <Menu.Item key='event'>专题事件</Menu.Item>
                   <Menu.Item key='top' disabled>专贴分析</Menu.Item>

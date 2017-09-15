@@ -1,8 +1,9 @@
 import  React from 'react';
 import { Link } from 'react-router';
 import PureRenderMixin from 'react-addons-pure-render-mixin'
+
 import './style.less';
-class NotFound extends React.Component{
+class TestDemoTweenFirst extends React.Component{
     constructor(props, context){
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
@@ -19,4 +20,4 @@ class NotFound extends React.Component{
     }
 }
 
-export default NotFound;
+export default TestDemoTweenFirst;

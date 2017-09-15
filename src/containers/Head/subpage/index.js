@@ -1,9 +1,13 @@
 import  React from 'react';
 import { Link } from 'react-router';
 import PureRenderMixin from 'react-addons-pure-render-mixin'
-import { Menu, Icon, Button, Dropdown } from 'antd';
+import { Menu, Icon, Button, Dropdown, DatePicker  } from 'antd';
+import moment from 'moment';
 
+moment.locale('zh-cn');
 const SubMenu = Menu.SubMenu;
+const { MonthPicker } = DatePicker;
+
 
 import './style.less';
 
@@ -23,6 +27,10 @@ class User extends React.Component{
     RightCom() {
         this.props.handleRightCom();
     }
+    mouthChange(data, dateString) {
+      this.props.handleChangeReportDateAction(dateString.slice(0, 4), dateString.slice(5));
+        // console.log('selected month', data, dateString); 
+    }
     render(){
     const menu = (
         <Menu>
@@ -37,17 +45,28 @@ class User extends React.Component{
         </Menu>
     )
         return(
-            <div className='head-userinfo'>
+            <div id='head-userinfo'>
                 <p>
                     <Dropdown overlay={menu} placement="bottomLeft">
                         <span>
-                            <Icon type="user" style={{ fontSize: 16, color: '#08c' }} />
+                            <Icon type="user" style={{ fontSize: 16, color: '#08c', paddingRight: 5 }} />
                              {this.props.role} {this.props.username}
                             <Icon type="down"  />
                         </span>
                     </Dropdown>
                     <span className='head-reporter'>
-                    <Button icon='exception' loading={this.props.isDownLoadReport} onClick={this.DownLoad.bind(this) }>生成报表</Button>
+                      <MonthPicker
+                        disabled={this.props.isDownLoadReport}
+                        className='head-monthpicker' 
+                        onChange={this.mouthChange.bind(this)} 
+                        placeholder='Select month '
+                        defaultValue={moment(new Date(), 'yyyy-MM')}/>
+
+                      <Button
+                        className='head-report-btn'
+                        icon='exception' 
+                        loading={this.props.isDownLoadReport}
+                        onClick={this.DownLoad.bind(this)} >生成报表</Button>
                     </span>
                 </p>
             </div>
@@ -55,7 +74,7 @@ class User extends React.Component{
         )
     }
 }
-
+// 
 
 
 export default User
