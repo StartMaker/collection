@@ -27,6 +27,7 @@
     "echarts-for-react": "^1.4.4",
     "es6-promise": "^4.1.1",
     "pubsub-js": "^1.5.4",
+    "rc-tween-one": "^1.4.5",
     "react": "^15.0.2",
     "react-addons-pure-render-mixin": "^15.6.0",
     "react-dom": "^15.0.2",
