@@ -8,12 +8,12 @@ import DataExhibition from '../DataExhibition';
 // import { Button } from 'antd';
 // import getMockData from '../../fetch/easyMockTest';
 
-import TestDemoTweenFirst from '../../components/testCom/TweenOne-FirstDemo';
+// import TestDemoTweenFirst from '../../components/testCom/TweenOne-FirstDemo';
 
 
 import * as userInfoActionsFromOtherFile from '../../actions/userinfo.js';
 
-import DailyDataList from '../DataList/dailyList';
+import HandleDataList from '../DataList/handleList';
 
 class Handle extends React.Component{
     constructor(props, context){
@@ -47,11 +47,13 @@ class Handle extends React.Component{
         return(
             <div>
                 <Header user= { username } role={ role } selectedKeys='handle'/> { /* 头部 */} 
-                <TestDemoTweenFirst />
+                <DataExhibition tableType='handledEvent' token={this.props.userinfo.token}/>  { /* 图表 */}
+                <HandleDataList token={this.props.userinfo.token} user= { username }/>  { /*  列表展示  */}
             </div>
         )
     }
 }
+                // <TestDemoTweenFirst />  动画测试
                 // <DailyDataList token={this.props.userinfo.token} user= { username }/>  { /*  列表展示  */}
                 // <DataExhibition tableType='dailyEvent' token={this.props.userinfo.token}/>  { /* 图表 */}
 // easy mock test

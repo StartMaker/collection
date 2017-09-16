@@ -18,17 +18,18 @@ class TableWrap extends React.Component{
     //     if (nextProps) {};
     // }
     render(){
-        const { columns, data, sumPage, title } = this.props; 
+        const { columns, data, sumPage, title, loading, rowSelection  } = this.props; 
         return(
             <div>
                 <Table
+                rowSelection={rowSelection||''}
                 className='table-style'
                  pagination={{pageSize: 5,
                     total: sumPage*5,
                     showQuickJumper: true}}
                  columns={columns}
                  dataSource={data}
-                 loading={this.props.loading}
+                 loading={loading}
                  onChange={this.handleTableChange.bind(this)}/> 
             </div>
         )

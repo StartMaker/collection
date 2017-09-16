@@ -44,6 +44,7 @@ class TestAnimating extends React.Component{
     render(){
         return(
             <div>
+            <span> 单元素动画 </span>
                 <TweenOne
                 animation={this.state.animation}
                 paused={this.state.paused}

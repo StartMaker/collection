@@ -4,7 +4,7 @@ import PureRenderMixin from 'react-addons-pure-render-mixin'
 import { message, Popconfirm, Icon, Modal  } from 'antd';
 
 import TableWrap from '../../../components/TableWrap';
-import getDailyDataList from '../../../fetch/dailyDataList';
+import getDailyDataList from '../../../fetch/DataList/dailyDataList';
 import getDailyDataSumPage from '../../../fetch/sumPage/dailyPage';
 import collect from '../../../fetch/collect';
 
