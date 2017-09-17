@@ -7,7 +7,7 @@ import TableWrap from '../../../components/TableWrap';
 
 import getHandleDataList from '../../../fetch/DataList/handleDataList';
 // import getHandleDataSumPage from '../../../fetch/sumPage/handlePage';
-// import collect from '../../../fetch/collect';
+import deleteEvent from '../../../fetch/deleteEvent';
 
 import * as fetchType from '../../../constants/fetchType';
 
@@ -19,8 +19,17 @@ import './style.less';
 
 const RadioGroup = Radio.Group;
 
+
+// ensure there is no unnecessary rendering for some this.state that is not for components immediatly
+
 var cacheData = [];  // 缓存已请求的数据
 var deleteIds = [];  // 保存要删除行的id
+var urlBody = {       // 筛选请求参数
+    isHandled: 2,
+    isFeedBack: 2,
+    isAll: true,
+    more: 0
+};
 
 class HandleDataList extends React.Component{
     constructor(props, context){
@@ -33,28 +42,12 @@ class HandleDataList extends React.Component{
             visible: false,
             currentCowData: {},  // 选中的行info
             loading: false,    
-            urlBody: {           // 筛选请求参数
-                isHandled: 2,
-                isFeedBack: 2,
-                isAll: true,
-                more: 0
-            },
             selectedRowKeys: [], // 删除选择行的keys
-            FeedBack: {          // 筛选反馈情况  
+            isHandled: {   // 筛选处置情况
                 value: 2
             },
-            HandledCondition: {  // 筛选处置情况
+            isFeedBack: {  // 筛选反馈情况 
                 value: 2
-            },
-            radioDisable: {      // 单选逻辑
-                handledCondition: {
-                    done: false,
-                    not: false
-                },
-                feedBack: {
-                    done: false,
-                    not: false
-                }
             }
         };
     }
@@ -68,23 +61,51 @@ class HandleDataList extends React.Component{
                 loading: true
             })
         }
+        if (!!cacheData.length) {
+            this.setState({
+                isHandled: {
+                    value: cacheData.filterCondition.isHandled.value
+                },
+                isFeedBack: {
+                    value: cacheData.filterCondition.isFeedBack.value
+                }
+            })
+        }
+    }
+    // 处理筛选
+    handleFilter({ key, value }) {
+        let isAll = value == 2 ? true : false;
+        if (isAll) {
+            this.setState({
+                isHandled: {value: 2},
+                isFeedBack: {value: 2}
+            })
+        }
+        cacheData = [];
+        // this,setState 没有办法保证是同步的操作
+        // 解决办法:
+        // 1.取消不是直接关联组件的状态数据
+        // 2.使用this.setState的回调函数
+        this.setState({
+            [key]: {
+                value: value
+            }
+        });
+        urlBody = Object.assign({}, urlBody, {
+            [key]: value,
+            isAll
+        })
+        this.getDataListByPage(1);
     }
     // 记录反馈情况的变化
-    handleFeedBackChange(e) {
-        this.setState({
-            FeedBack:{
-                value: e.target.value
-            }
-        })
+    handleFeedBackChange(e) {  
+        this.handleFilter({key: 'isFeedBack', value: e.target.value});
     }
     // 记录处置情况的变化
     handleHandledConditionChange(e) {
-        this.setState({
-            HandledCondition:{
-                value: e.target.value
-            }
-        })
+        this.handleFilter({key: 'isHandled', value: e.target.value});
     }
+
     // 改变删除选择框
     handleSelectChange(selectedRowKeys) {
         deleteIds = [];
@@ -107,6 +128,7 @@ class HandleDataList extends React.Component{
     // 将fetch到的数据加入缓存 相同页数覆盖
     pushCache(page, json, sumPage=0) {
         let isIn = false;
+        let { isHandled, isFeedBack } = this.state;
         // 覆盖相同页码的数据
         cacheData=cacheData.map((item, index) => {
             if (item.page != page){
@@ -129,6 +151,11 @@ class HandleDataList extends React.Component{
                 page,
                 json,
             })
+            // 保存当前筛选条件
+            cacheData.filterCondition = {
+                isHandled,
+                isFeedBack
+            }
         }
     }
     // 获取指定页数的数据
@@ -152,7 +179,7 @@ class HandleDataList extends React.Component{
         let { token } = this.props;
         let result = getHandleDataList({
             url: page,
-            body: this.state.urlBody
+            body: urlBody
         }, token, fetchType.FETCH_TYPE_GET_URL2PARAMS);
         // 处理返回的promise对象
         result.then(resp => {
@@ -212,46 +239,26 @@ class HandleDataList extends React.Component{
             })        
         }
     }
-    // 归集
-    handleConnectionAction(info) {
-        const { user, token } = this.props;
-        const id = info.id;
-        delete info.id;
-
-        this.setState({
-            loading: true
-        })
-        let result = collect({
-            url: id,
-            body: Object.assign({}, {recorder: user}, info )
-        }, token, fetchType.FETCH_TYPE_POST_URL2PARAMS );
-        // 归集结果
-        result.then(resp => {
-            setTimeout(() => {
-                this.setState({
-                    loading: false
-                })
-            }, 300)
-            return resp.text();
-        }).then(text =>{
-            if (text=== '归集成功') {
-                message.success('归集成功！');
-                this.getDataListByPage(this.state.currentPage, 0, true);
-            } else {
-                message.error(`归集失败！${text}`);
-            }
-        }).catch(ex =>{
-                console.log('服务器内部错误', ex.message);
-            if (__DEV__) {
-            }
-        })
-    }
     // handleSelectChangeSelect(record, selected, selectedRows) {
 
     //     console.log('record, selected, selectedRows', record, selected, selectedRows)
     // }
-    
+
+    // 删除动作
     handleDeleteAction() {
+        let { token } = this.props;
+        let result = deleteEvent(deleteIds, token)
+        result.then(resp =>{
+            if(resp.ok) {
+                return resp.text()
+            }
+        }).then(text => {
+            this.setState({
+                selectedRowKeys: []
+            });
+            this.getDataListByPage(this.state.currentPage, 0, true);
+            message(text);
+        })
         console.log('delete object', deleteIds);
     }
     render(){
@@ -261,7 +268,6 @@ class HandleDataList extends React.Component{
             onChange: this.handleSelectChange.bind(this),
         }
         // 表头
-        const { handledCondition, feedBack } = this.state.radioDisable;
         const radioStyle = {
             display: 'block', 
             height: '30px', 
@@ -290,11 +296,10 @@ class HandleDataList extends React.Component{
             dataIndex: 'handledCondition',
             filterDropdown: (
                 <div id='handled-filter-wrap'>
-                <RadioGroup onChange={this.handleHandledConditionChange.bind(this)} value={this.state.HandledCondition.value}>
-                    <Radio disabled={handledCondition.not} style={radioStyle} value={0}>未处置</Radio>
-                    <Radio disabled={handledCondition.done} style={radioStyle} value={1}>已处置</Radio>
+                <RadioGroup onChange={this.handleHandledConditionChange.bind(this)} value={this.state.isHandled.value}>
+                    <Radio disabled={this.state.isFeedBack.value==1? true :false} style={radioStyle} value={0}>未处置</Radio>
+                    <Radio style={radioStyle} value={1}>已处置</Radio>
                     <Radio style={radioStyle} value={2}>全选</Radio>
-
                   </RadioGroup>
                 </div>
             ),
@@ -304,10 +309,9 @@ class HandleDataList extends React.Component{
             dataIndex: 'feedbackCondition',
             filterDropdown: (
                 <div id='handled-filter-wrap'>
-                <RadioGroup onChange={this.handleFeedBackChange.bind(this)} value={this.state.FeedBack.value}>
-                    <Radio disabled={feedBack.done} style={radioStyle} value={0}>未反馈</Radio>
-                    <Radio disabled={feedBack.done} style={radioStyle} value={1}>已反馈</Radio>
-                    <Radio style={radioStyle} value={2}>全选</Radio>
+                <RadioGroup onChange={this.handleFeedBackChange.bind(this)} value={this.state.isFeedBack.value}>
+                    <Radio style={radioStyle} value={0}>未反馈</Radio>
+                    <Radio disabled={this.state.isHandled.value==0? true :false} style={radioStyle} value={1}>已反馈</Radio>
                   </RadioGroup>
                 </div>
             ),
