@@ -157,6 +157,7 @@ class HandleDataList extends React.Component{
                 isFeedBack
             }
         }
+        console.log('cacheData', cacheData);
     }
     // 获取指定页数的数据
     getDataListByPage(page, more=0, refresh=false) {
@@ -170,10 +171,11 @@ class HandleDataList extends React.Component{
             })
             console.log('cache', cacheData);
             return;
-        }
+        }            
         // 加载中
         this.setState({ 
-            loading: true
+            loading: true,
+            selectedRowKeys: [] // 清空选择
         })
         // fetch
         let { token } = this.props;
@@ -251,13 +253,14 @@ class HandleDataList extends React.Component{
         result.then(resp =>{
             if(resp.ok) {
                 return resp.text()
+            } else {
+                message.error('删除过程中发生错误');
             }
         }).then(text => {
-            this.setState({
-                selectedRowKeys: []
-            });
             this.getDataListByPage(this.state.currentPage, 0, true);
-            message(text);
+            message.success(text);
+        }).catch(ex => {
+            console.log(ex.message);
         })
         console.log('delete object', deleteIds);
     }
