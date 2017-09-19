@@ -12,7 +12,7 @@ import deleteEvent from '../../../fetch/deleteEvent';
 import * as fetchType from '../../../constants/fetchType';
 
 
-// import Collection from './subpage';
+import Handled from './subpage';
 import format from '../../DataExhibition/subpage/format'
 
 import './style.less';
@@ -36,10 +36,10 @@ class HandleDataList extends React.Component{
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
         this.state = {
+            visible: false,  // 弹窗显示
             currentPage: 1,
             data: [],  
             sumPage: 0,
-            visible: false,
             currentCowData: {},  // 选中的行info
             loading: false,    
             selectedRowKeys: [], // 删除选择行的keys
@@ -214,16 +214,8 @@ class HandleDataList extends React.Component{
     otherPageAction(page){
         this.getDataListByPage(page);
     }
-    // 修改表单
-    handleClickAction(record){
-        // console.log(record);
-        this.setState({
-            visible: true,
-            currentCowData: record
-        })
-    } 
-    handleConnectAction() {
-        console.log('connetion');
+    handleHandleAction() {
+        console.log('handle');
         this.setState({
             visible: false
         })
@@ -263,6 +255,13 @@ class HandleDataList extends React.Component{
             console.log(ex.message);
         })
         console.log('delete object', deleteIds);
+    }
+    handleDoubleClickRowAction(info) {
+        console.log('double click in ', info);
+        this.setState({
+            visible: true,
+            currentCowData: info
+        })
     }
     render(){
         // 选择框
@@ -345,31 +344,34 @@ class HandleDataList extends React.Component{
                     disabled={!!this.state.selectedRowKeys.length ? false : true }
                     onClick={this.handleDeleteAction.bind(this)}>删除</Button>
                 </p>
+
                 <TableWrap
+                handleDoubleClickRow={ this.handleDoubleClickRowAction.bind(this) }
                 {...this.state}
                 rowSelection={rowSelection}
                 columns={columns}
                 clickOtherPageAction={this.otherPageAction.bind(this)}/>
 
+                <Modal 
+                 footer={null}
+                 width='935px'
+                 visible={this.state.visible}
+                 title='待处置事件'
+                 onOk={this.handleHandleAction.bind(this) }
+                 onCancel={this.handleModalCancelAction.bind(this)}
+                 >
+                     { /* 处置 */} 
+                 <Handled 
+                    loading= {this.state.loading}
+                    data={[this.state.currentCowData]}
+                    handleCancel={this.handleModalCancelAction.bind(this)}
+                    />
+                     
+                 </Modal>
             </div>
 
         )
     }
 }
-
-                // <Modal 
-                //  footer={null}
-                //  width='935px'
-                //  visible={this.state.visible}
-                //  title='待归集事件'
-                //  onOk={this.handleConnectAction.bind(this) }
-                //  onCancel={this.handleModalCancelAction.bind(this)}
-                //  >
-                //      { /* 归集 */} 
-                //  <Collection 
-                //     loading= {this.state.loading}
-                //     data={[this.state.currentCowData]}
-                //     handleCancel={this.handleModalCancelAction.bind(this)}
-                //     handleConnection={this.handleConnectionAction.bind(this)} />
-                //  </Modal>
+// handleConnection={this.handleConnectionAction.bind(this)} 
 export default HandleDataList;
