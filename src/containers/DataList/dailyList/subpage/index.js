@@ -33,8 +33,8 @@ class Collection extends React.Component{
             // this.initDataAction('mainView', text);
             return (
             <EditableInput  
-            value={text}
-            onChange={this.handleChangeType.bind(this)} />
+            value={this.state.mainView}
+            onChange={this.handleChangeMainView.bind(this)} />
             )
           }
         },{
@@ -49,8 +49,8 @@ class Collection extends React.Component{
             // this.initDataAction('postType', text);
             return (
             <EditableInput  
-            value={text}
-            onChange={this.handleChangeMainView.bind(this)} />
+            value={this.state.postType}
+            onChange={this.handleChangeType.bind(this)} />
             )
           }
         },{
@@ -65,8 +65,8 @@ class Collection extends React.Component{
     //     initData.length > 1 ? " " : initData.push({ [ key ]: value}); // es6 对象变量名拓展
     // }
     //  初始化state
-    initState() {  
-        const { mainView, postType, id } = this.props.data[0];
+    initState(state) {  
+        const { mainView, postType, id } = !!state ? state.data[0] : this.props.data[0];
         this.setState({
             mainView,
             postType,
@@ -77,25 +77,22 @@ class Collection extends React.Component{
     componentDidMount() {  
         this.initState();
     }
-    // 每次重新渲染都初始化state
-    componentDidUpdate() { 
-        this.initState();
-    }
     // 每次postType改变时就记录
     handleChangeType(postType) {
-      this.setState({postType});
-
-        this.setState({ // 允许归集
-            connectable: false
-        })
+      console.log('postType', postType);
+      this.setState({
+        postType,
+        connectable: false // 允许归集
+      });
     }
     // 每次mainView改变时就记录
     handleChangeMainView(mainView){
-      this.setState({mainView});
+      console.log('mainView', mainView);
 
-      this.setState({ // 允许归集
-            connectable: false
-        })
+      this.setState({
+        mainView,
+        connectable: false // 允许归集
+      });
     }
     // 隐藏弹窗
     handleCancelAction() {  
@@ -121,6 +118,7 @@ class Collection extends React.Component{
         this.setState({
             connectable: true,
         })
+        this.initState(nextProps);
       }
     }
     render(){

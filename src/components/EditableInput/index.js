@@ -2,7 +2,7 @@
 * @Author: fxy
 * @Date:   2017-09-12 13:33:18
 * @Last Modified by:   anchen
-* @Last Modified time: 2017-09-13 16:43:07
+* @Last Modified time: 2017-09-20 13:10:18
 */
 
 import  React from 'react';
@@ -23,12 +23,12 @@ class EditableInput extends React.Component{
     }
     handleChange(e) {
         const value = e.target.value;
-        console.log('value', value);
+        // console.log('value', value);
         this.setState({value})
     }
     check() {
         this.setState({ediable: false});
-        if (this.props.onChange) {
+        if (!!this.props.onChange) {
           this.props.onChange(this.state.value);
         }
     }

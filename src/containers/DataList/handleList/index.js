@@ -7,6 +7,7 @@ import TableWrap from '../../../components/TableWrap';
 
 import getHandleDataList from '../../../fetch/DataList/handleDataList';
 // import getHandleDataSumPage from '../../../fetch/sumPage/handlePage';
+import Handle from '../../../fetch/handle';
 import deleteEvent from '../../../fetch/deleteEvent';
 
 import * as fetchType from '../../../constants/fetchType';
@@ -61,6 +62,7 @@ class HandleDataList extends React.Component{
                 loading: true
             })
         }
+        // 从缓存中读取用户筛选信息
         if (!!cacheData.length) {
             this.setState({
                 isHandled: {
@@ -214,11 +216,37 @@ class HandleDataList extends React.Component{
     otherPageAction(page){
         this.getDataListByPage(page);
     }
-    handleHandleAction() {
-        console.log('handle');
-        this.setState({
-            visible: false
+    // 处置动作
+    handleHandleAction(obj) {
+        const { handledCondition, feedbackCondition, id, detail } = obj;
+        console.log(obj);
+        let { token, user } = this.props;
+        let result = Handle({
+            body: {
+                eventHandler: user,
+                feedbackCondition,
+                handledCondition: handledCondition.join('/'),
+                id,
+                detail
+            },
+            url: id
+        }, token, fetchType.FETCH_TYPE_POST_URL2BODY);
+        // 处理返回的promise
+        result.then(resp => {
+            if (resp.ok) {
+                return resp.text()
+            } else {
+                message.error('处置过程中发生错误, 请稍后再试');
+            }
+        }).then(text => {
+            message.success(text);
+            this.getDataListByPage(this.state.currentPage, 0, true);
+        }).catch(ex => {
+            console.log(ex.message);
         })
+        // this.setState({
+        //     visible: false
+        // })
     }
     handleModalCancelAction() {
         console.log('cancel');
@@ -257,7 +285,7 @@ class HandleDataList extends React.Component{
         console.log('delete object', deleteIds);
     }
     handleDoubleClickRowAction(info) {
-        console.log('double click in ', info);
+        // console.log('double click in ', info);
         this.setState({
             visible: true,
             currentCowData: info
@@ -365,6 +393,7 @@ class HandleDataList extends React.Component{
                     loading= {this.state.loading}
                     data={[this.state.currentCowData]}
                     handleCancel={this.handleModalCancelAction.bind(this)}
+                    handleHandle={this.handleHandleAction.bind(this)}
                     />
                      
                  </Modal>

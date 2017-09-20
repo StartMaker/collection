@@ -204,21 +204,20 @@ class Handled extends React.Component{
     constructor(props, context){
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-         this.state= {
-            handledCondition: '',
+         this.state = {
+            handledCondition: [],
             feedbackCondition: '',
+            detail: '',
             id: '',
             Operable: true,
-            loading: false
+            loading: false,
          }
     }
     // 保存处置情况
     handleChangeHandleOption(handledCondition) {
-      console.log('text', handledCondition);
       this.setState({
-        handledCondition: handledCondition
-      }, ()=> {
-        console.log('处置过后的state', this.state.handledCondition);
+        handledCondition: handledCondition,
+        Operable: handledCondition[0]==='未处置' ? true : false
       })
     }
     // 保存反馈情况
@@ -227,20 +226,24 @@ class Handled extends React.Component{
         feedbackCondition: feedbackCondition
       })
     }
-    // initDataAction(key, value) {
-    //     initData.length > 1 ? " " : initData.push({ [ key ]: value}); // es6 对象变量名拓展
-    // }
+
     //  初始化state
-    initState() {  
-        const { handledCondition, feedbackCondition, id } = this.props.data[0];
+    initState(state) {
+        const { handledCondition, feedbackCondition, id, detail } = !!state ? state.data[0] : this.props.data[0];
         this.setState({
-            handledCondition,
+            handledCondition: Array.isArray.call(handledCondition) ? handledCondition : handledCondition.split('/'),
             feedbackCondition,
-            id
-        })  
+            id,
+            detail,
+        }, ()=>{
+          let OperableFlag = this.state.handledCondition[0];
+          this.setState({
+            Operable: OperableFlag==='未处置' ? true : false
+          })
+        })
     }
     // 第一次挂载时加载初始化state
-    componentDidMount() {  
+    componentDidMount() {
         this.initState();
     }
     // 每次重新渲染都初始化state
@@ -254,44 +257,36 @@ class Handled extends React.Component{
         //     Operable: false
         // })
     }
-    // 每次mainView改变时就记录
-    // handleChangeMainView(mainView){
-    //   this.setState({mainView});
-
-    //   this.setState({ // 允许归集
-    //         Operable: false
-    //     })
-    // }
     // 隐藏弹窗
     handleCancelAction() {  
       this.props.handleCancel()
     }
-    // 归集
+    // 处置
     handleHandleAction() {  
       this.setState({
         loading: true
       });
-      const { mainView, postType, id } = this.state; 
-      this.props.handleConnection({
-        mainView,
-        postType,
-        id
-      });
+      const { handledCondition, feedbackCondition, id, detail } = this.state;
 
-      
-        // this.handleCancelAction();
+      this.props.handleHandle({
+        handledCondition,
+        feedbackCondition,
+        id,
+        detail
+      });
+      this.handleCancelAction();
     }
     componentWillUpdate(nextProps, nextState) {
       if (this.props.data !== nextProps.data) {
         this.setState({
             Operable: true,
         })
-        this.initState();
+        this.initState(nextProps);
       }
     }
     render(){
-       const { theme, mainView, source, postType, followCount, postTime } = this.props.data;
-       const data =  this.props.data;
+       // const { theme, mainView, source, postType, followCount, postTime } = this.props.data;
+       // console.log('handled render', data);
        const columns = [{
           title: '主题',
           dataIndex: 'theme'
@@ -310,8 +305,7 @@ class Handled extends React.Component{
             style={{ width: 200 }}
             options={handleOptions}
             onChange={this.handleChangeHandleOption.bind(this)} 
-            value={[this.state.handledCondition]}
-            defaultValue={this.state.handledCondition}/>
+            value={this.state.handledCondition}/>
             )
           }
         },{
@@ -334,8 +328,8 @@ class Handled extends React.Component{
           render: (text, record, index) => {
             return (
               <EditableInput 
-               value={record.detail}
-               onChange={this.handleChangeFeedbackOption.bind(this)} />
+               value={this.state.detail}
+               onChange={this.handleDetailChange.bind(this)} />
             )
           }
         }]
@@ -347,9 +341,9 @@ class Handled extends React.Component{
             size="small"
             pagination={false}
             bordered
-            dataSource={data}
+            dataSource={this.props.data}
             columns={columns}>
-            </Table>
+            </Table> 
             <div className='connect-btn-container'>
                 <Button onClick={this.handleCancelAction.bind(this)}>取消</Button>
                 <Button 
