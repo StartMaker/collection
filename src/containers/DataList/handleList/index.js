@@ -64,12 +64,13 @@ class HandleDataList extends React.Component{
         }
         // 从缓存中读取用户筛选信息
         if (!!cacheData.length) {
+            console.log('从缓存中读取用户筛选信息', cacheData);
             this.setState({
                 isHandled: {
-                    value: cacheData.filterCondition.isHandled.value
+                    value: cacheData.filterCondition.isHandled.value || 2
                 },
                 isFeedBack: {
-                    value: cacheData.filterCondition.isFeedBack.value
+                    value: cacheData.filterCondition.isFeedBack.value || 2
                 }
             })
         }

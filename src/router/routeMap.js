@@ -1,10 +1,10 @@
 import React from 'react';
 import { Router, Route, IndexRoute } from 'react-router';
 
-import Analyse from '../containers/Analyse';
-import Event from '../containers/Event';
-import Topic from '../containers/Topic';
-import Handle from '../containers/Handle';
+import Analyse from '../containers/Analyse';  // 舆情分析
+import Handle from '../containers/Handle'; // 舆情处置
+import Special from '../containers/Special';  // 专题事件
+// import Event from '../containers/Event'; 
 import Login from '../containers/Login';
 import NotFound from '../containers/Notfound';
 import App from '../containers/App'
@@ -23,9 +23,8 @@ updateHandle() {
                 <Route path='/' component={App}> 
                     <IndexRoute component={Login}/> 
                     <Route path='/ana' component={Analyse}/>
-                    <Route path='/event' component={Event}/>
                     <Route path='/handle' component={Handle}/>
-                    <Route path='/topic' component={Topic}/> 
+                    <Route path='/special' component={Special}/> 
                     <Route path='/login(/:router)' component={Login} /> 
                     <Route path="*" component={NotFound}/> 
                 </Route> 
