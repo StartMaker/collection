@@ -255,7 +255,7 @@ class DailyDataList extends React.Component{
     }
     render(){
         return(
-            <div id='tableWrap' className='container-flex'>
+            <div className='container-flex tableWrap'>
                 <p className='section-header'>全部舆情事件</p>
                 <TableWrap
                 {...this.state}

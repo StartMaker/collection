@@ -51,7 +51,7 @@ class Special extends React.Component{
             <div>
                 <Header user= { username } role={ role } selectedKeys='special'/> { /* 头部 */} 
                 <DataExhibition tableType='specialEvent' token={this.props.userinfo.token}/>  { /* 图表 */}
-                <SpecialTable />  { /*折叠表格 */}
+                <SpecialTable user= { username } token={this.props.userinfo.token}/>  { /*折叠表格 */}
             </div>
         )
     }

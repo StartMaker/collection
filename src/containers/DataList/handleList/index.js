@@ -365,11 +365,11 @@ class HandleDataList extends React.Component{
         }];
 
         return(
-            <div id='tableWrap' className='container-flex'>
+            <div className='container-flex tableWrap'>
                 <p className='section-header'>
                     全部舆情事件
                     <Button type='primary' 
-                    className='table-delete-btn'
+                    className='table-right-btn'
                     disabled={!!this.state.selectedRowKeys.length ? false : true }
                     onClick={this.handleDeleteAction.bind(this)}>删除</Button>
                 </p>
@@ -388,7 +388,7 @@ class HandleDataList extends React.Component{
                  title='待处置事件'
                  onOk={this.handleHandleAction.bind(this) }
                  onCancel={this.handleModalCancelAction.bind(this)}
-                 >
+                    >
                      { /* 处置 */} 
                  <Handled 
                     loading= {this.state.loading}
