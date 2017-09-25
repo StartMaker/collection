@@ -73,12 +73,13 @@ class TagInput extends React.Component{
     }
     render(){
         const { editable, value, tags } = this.state;
+        const { iconStyle, tagColor } = this.props;
         return(
             <div id='taginput-wrap'>
                 <p>{!!tags ? tags.map((item, index) =>{
                         return (
                             <span className='event-tag-warp' key={index}>
-                                <Tag closable onClose={e=>{this.handleDeleteTag(e)}} color="#2db7f5">{item}</Tag>
+                                <Tag closable onClose={e=>{this.handleDeleteTag(e)}} color={tagColor}>{item}</Tag>
                             </span>
                         )
                     }) : ''
@@ -88,7 +89,7 @@ class TagInput extends React.Component{
                     <Icon title='Add' type='check' className='taginput-edit-icon' onClick={this.handleCheck.bind(this)}/>
                     <Input
                     onPressEnter={this.handlePressEnter.bind(this)}
-                    prefix={<Icon type="environment" style={{ fontSize: 13 }} />}
+                    prefix={<Icon type={iconStyle} style={{ fontSize: 13 }} />}
                     value={value}
                     onChange={this.handleChangeValue.bind(this)} />
                      </p> : <Icon title='Add new region' className='taginput-edit-icon' type='edit' onClick={this.handleEdit.bind(this)} /> 

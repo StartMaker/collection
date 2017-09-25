@@ -5,6 +5,7 @@ import { Form, Icon, Input, Button, message, Modal  } from 'antd';
 
 import TagInput from '../../../../components/TagInput';
 
+import addTopic from '../../../../fetch/addTopic';
 const FormItem = Form.Item;
 import './style.less';
 
@@ -12,17 +13,40 @@ class IncreaseEventWrap extends React.Component{
     constructor(props, context){
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+        this.state = {
+            topicName: '',
+            region: ['西南石油大学'],
+            rules: []
+        }
     }
     handleCancel(){
         this.props.onCancle();
     }
     handleOk(){
-        this.props.onAdd();
+        // this.props.onAdd();
+        let topicName = this.props.form.getFieldValue('name');
+        this.setState({topicName});
+        let { region, rules } = this.state;
+        let { token, user } = this.props;
+        if ( !topicName || !region|| !rules) {
+            message.error('input null');
+            return;
+        }
+        let result = addTopic({id: 0, name: topicName, region, rules}, token);
+        result.then(resp =>{
+            if (resp.ok) {
+                return resp.text()
+            }
+        }).then(text =>{
+            message.success(text, '功能测试中') ;  
+        })
     }
-    handleGetRegionAction(regions) {
-        console.log('父组件得到的regions', regions);
+    handleGetRegionAction(region) {
+        this.setState({region});
+        console.log('父组件得到的region', region);
     }
     handleGetRulesAction(rules) {
+        this.setState({rules});
         console.log('父组件得到的rules', rules);
     }
     render(){
@@ -43,7 +67,10 @@ class IncreaseEventWrap extends React.Component{
                 {getFieldDecorator('region', {
                     rules: [{ required: true, message: 'Please input topic name!' }],
                   })(
-                    <TagInput handlePopValue={this.handleGetRegionAction.bind(this)} initTags={['西南石油大学']} />
+                    <TagInput 
+                    tagColor='#108ee9'
+                    iconStyle='environment'
+                    handlePopValue={this.handleGetRegionAction.bind(this)} initTags={['西南石油大学']} />
                    )}
                 </FormItem>
                 <FormItem
@@ -51,13 +78,16 @@ class IncreaseEventWrap extends React.Component{
                 {getFieldDecorator('rules', {
                     rules: [{ required: true, message: 'Please input topic name!' }],
                   })(
-                    <TagInput handlePopValue={this.handleGetRulesAction.bind(this)} />
+                    <TagInput 
+                    tagColor='#f50'
+                    iconStyle='key'
+                    handlePopValue={this.handleGetRulesAction.bind(this)} />
                    )}
                 </FormItem>
             </Form>
-            <p>            
+            <p className='modal-foot-btn-container'>            
                 <Button key="back" onClick={this.handleCancel.bind(this)}>取消</Button>,
-                <Button key="submit" type="primary" onClick={this.handleOk}>
+                <Button title='make sure you have clicked the check button' key="submit" type="primary" onClick={this.handleOk.bind(this)}>
                   添加
                 </Button>
             </p>
