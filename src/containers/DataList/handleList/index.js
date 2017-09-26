@@ -8,6 +8,7 @@ import TableWrap from '../../../components/TableWrap';
 import getHandleDataList from '../../../fetch/DataList/handleDataList';
 // import getHandleDataSumPage from '../../../fetch/sumPage/handlePage';
 import Handle from '../../../fetch/handle';
+
 import deleteEvent from '../../../fetch/deleteEvent';
 
 import * as fetchType from '../../../constants/fetchType';

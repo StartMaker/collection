@@ -26,7 +26,7 @@ class Collection extends React.Component{
         },{
           title: '主要观点',
           dataIndex: 'mainView',
-          width: '45%',
+          width: '40%',
           render: (text, record, index) =>{ 
             // console.log('text, record, index', text, record, index);
             // const initMainView = text;
@@ -39,7 +39,8 @@ class Collection extends React.Component{
           }
         },{
           title: '更贴量',
-          dataIndex: 'followCount'
+          dataIndex: 'followCount',
+          width: '8%',
         },{
           title: '类别',
           dataIndex: 'postType',
@@ -55,10 +56,12 @@ class Collection extends React.Component{
           }
         },{
           title: '发帖时间',
-          dataIndex: 'postTime'
+          dataIndex: 'postTime',
+          width: '8%',
         },{
           title: '来源',
-          dataIndex: 'source'
+          dataIndex: 'source',
+          width: '8%',
         }]
     }
     // initDataAction(key, value) {

@@ -22,6 +22,7 @@ class IncreaseEventWrap extends React.Component{
     handleCancel(){
         this.props.onCancle();
     }
+    
     handleOk(){
         // this.props.onAdd();
         let topicName = this.props.form.getFieldValue('name');

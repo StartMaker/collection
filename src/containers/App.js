@@ -15,7 +15,7 @@ import { connect } from 'react-redux'
 // import '../static/css/common.less';
 
 
-import 'antd/dist/antd.css'
+// import 'antd/dist/antd.css'
 import '../static/css/common.less'
 class App extends React.Component { 
     constructor(props, context) {
