@@ -15,9 +15,19 @@ import Collection from '../../DataList/dailyList/subpage';
 import IncreaseEvent from './IncreaseEventWrap'
 import './style.less';
 
+/*
+cacheData 结构;
+缓存子表格数据;
+ id->
+ [{
+  page: ...,
+  value: ...
+  }, ... ]
 
+ */
 
 var cacheData = new Map();
+
 class NestedTable extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -67,7 +77,7 @@ class NestedTable extends React.Component {
       key: 'operation',
       render: (text, record, index) => {
           if (!!!record.collectionStatus) {
-              return (    
+              return (
                   <Icon type='edit' className='table-edit-icon' onClick={e => {this.handleClickCollectionAction(record)} } />
               )
           }
@@ -96,18 +106,57 @@ class NestedTable extends React.Component {
   }
   // 测试换页
   async handlePageChange(...arg) {
+
     const [ id, pagination ] = [...arg];
 
-    let data = await this.getEventList(id, pagination.current);
+    // 拿到前几页的数据 / [obj, ...]
     let preCacheData = cacheData.get(id);
-    data.eventPageList = preCacheData.eventPageList.concat(data.eventPageList);
     let { topicList } = this.state;
 
+    // 确认数据源 缓存或者fetch
+    // console.log('page', pagination);
+    let cacheItem = preCacheData.filter((item, index)=>{
+      if(item.page===pagination.current){
+        return item
+      }
+    });
+
+    if ( !!cacheItem.length ) {
+      console.log('从cache中读取数据');
+      this.setState({
+        topicList: this.concatTopicList(topicList, cacheItem[0].value, id),
+      })
+      return;
+    }
+      console.log('从fetch中读取数据');
+
+    // 获取分页数据
+    /*
+      data:
+     {
+      eventPageList: ...,
+      pages: ...
+      }
+     */
+    let data = await this.getEventList(id, pagination.current);
+
+    // 更新缓存
+    preCacheData.push({page: pagination.current, value: data});
+    cacheData.set(id, preCacheData);
+
+    // 取消加载动画
+    if (!!data) {
+      this.setState({
+        nestedLoading: false
+      })
+    }
+
+    // 拼接数据并更新状态数据
+    let concatedData = this.concatTopicList(topicList, data, id);
     this.setState({
-      topicList: this.concatTopicList(topicList, data, id),
+      topicList: concatedData,
     })
-    this.state.
-    console.log('pagination', data);
+    // console.log('data after connect', concatedData);
   }
   // 点击归集按钮时
   handleClickCollectionAction(currentCowData) {
@@ -119,20 +168,22 @@ class NestedTable extends React.Component {
   componentWillMount() {
     this.getTopicList();
   }
-  // 对象链接
+  // 对象更新
   concatTopicList(preArr, newSingleObj, id) {
     return preArr.map((item, index)=>{
       if (item.id!=id) {return item}
       else {
         return Object.assign({}, item, {
          subpage: {
-           eventPageList: newSingleObj.eventPageList.concat(item.subpage.eventPageList),
-           pages: item.subpage.pages
+           pages: newSingleObj.pages,
+           eventPageList: newSingleObj.eventPageList,  // 替换
          }})
       }
     })
   }
-  // 获取事件列表
+           // eventPageList: item.subpage.eventPageList.concat(newSingleObj.eventPageList),
+
+  // 获取事件列表 返回fetch成功后的promise对象
   getEventList(id, page=1) {
     let { token } = this.props;
     // let data = [];
@@ -147,9 +198,7 @@ class NestedTable extends React.Component {
         ids: [id]
       }
     }, token, fetchType.FETCH_TYPE_GET_URL2PARAMS);
-    // 处理promise
     // return result;
-
     return result.then(resp => {   // 异步
       if (resp.ok){
         return resp.json()
@@ -198,32 +247,44 @@ class NestedTable extends React.Component {
 
   // async/await 异步问题的终极方案
   async onExpand(expanded, record) {
+    // 收起时
+    if (!expanded) {return}
+
     let id = record.id; 
-    let data = cacheData.has(id) ? cacheData.get(id) : await this.getEventList(id);
-    if (!!data) {
-      this.setState({
-        nestedLoading: false
-      })
-    }
-    cacheData.set(id, data);
     let { topicList } = this.state;
-    // console.log('map cacheData', cacheData);
+
+    // 第一次打开时从fetch中载入数据 否则从缓存中拿数据
+    let data = cacheData.has(id) ? cacheData.get(id)[0].value : await this.getEventList(id);
+
+    // 取消加载
+    this.setState({
+      nestedLoading: false
+    })
+    if (!data) {
+      message.error('没有相关数据');
+      return;
+    }
+     // 推入缓存
+    cacheData.set(id, [{page: 1, value: data}]);
+
+    // 转换时间戳
+    console.log('data', data);
     data.eventPageList = data.eventPageList.map((item, index)=>{
       return Object.assign({}, item, { postTime: format(item.postTime, 'MM-dd hh:mm')})
     }) 
-    console.log('data', data);
+    // 更新数据
     this.setState({
       topicList: this.concatTopicList(topicList, data, id)
     })
   }
-  // topicList.map((item, index)=>{
-  //       if (item.id != id) {return item}
-  //       else { return Object.assign({}, item, {subpage: data } )}
-  //     })
-  ///////////////////////////////////////////////////////
+
   // 添加专题
   handleOk() {
 
+  }
+  // 
+  updataTopicList() {
+    this.getTopicList();
   }
   // 归集
   handleConnectAction(obj) {
@@ -244,7 +305,7 @@ class NestedTable extends React.Component {
       }
     }).then(text => {
       message.success(text);
-      this.onExpand();
+      // this.onExpand();
     })
   }
   // 隐藏弹窗
@@ -299,6 +360,7 @@ class NestedTable extends React.Component {
             <IncreaseEvent
              token={token}
              user={user}
+             afterAdd={this.updataTopicList.bind(this)}
              onAdd={this.handleOk.bind(this)}
              onCancle={this.handleModalCancelAction.bind(this)}/>
 

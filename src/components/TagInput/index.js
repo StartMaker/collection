@@ -48,6 +48,7 @@ class TagInput extends React.Component{
     handleCheck() {
         // 隐藏输入框
         this.setState({editable: false});
+        this.props.onChangeInputStyle(true);
         // 将输入内容推入标签栏
         this.handlePressEnter();
         // 将标签栏的内容传递给父组件
@@ -55,6 +56,7 @@ class TagInput extends React.Component{
     }
     // 编辑标签
     handleEdit() {
+        this.props.onChangeInputStyle(false);
         this.setState({editable: true, value: ''})
     }
     // 生成标签

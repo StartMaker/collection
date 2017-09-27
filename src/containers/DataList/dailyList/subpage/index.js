@@ -77,7 +77,7 @@ class Collection extends React.Component{
         })  
     }
     // 第一次挂载时加载初始化state
-    componentDidMount() {  
+    componentDidMount() {
         this.initState();
     }
     // 每次postType改变时就记录
