@@ -311,7 +311,7 @@ class HandleDataList extends React.Component{
             width: '20%',
             render: (text, record, index) => {
                 return (
-                    <a href={record.url}>{record.theme}</a>
+                    <a target='_blank' href={record.url}>{record.theme}</a>
                 )
             }
         },{

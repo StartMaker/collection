@@ -25,6 +25,7 @@ class IncreaseEventWrap extends React.Component{
         this.props.onCancle();
     }
     
+    // 子表格归集
     handleOk(){
         // this.props.onAdd();
         let topicName = this.props.form.getFieldValue('name');

@@ -5,6 +5,8 @@ import { Table, Badge, Menu, Dropdown, Icon, Button, message, Modal  } from 'ant
 
 import getSpecialTopicList from '../../../fetch/SpecialList/topicList';
 import getSpecialEventList from '../../../fetch/SpecialList/eventList';
+import deleteSpecial from '../../../fetch/deleteSpecial';
+
 import * as fetchType from '../../../constants/fetchType';
 
 import format from '../../DataExhibition/subpage/format';
@@ -38,7 +40,8 @@ class NestedTable extends React.Component {
       collectModalVisible: false,    // 归集弹窗
       loading: false,                // 父表格加载状态
       nestedLoading: false,          // 子表格加载状态
-      currentCowData: []             // 当前操作行
+      currentCowData: [],            // 当前操作行
+      selectedRowKeys: [],           // 当前选中行
     }
   }
   // 折叠内容
@@ -52,7 +55,7 @@ class NestedTable extends React.Component {
       width: '19%',
       render: (text, record)=>{
         return (
-          <a href={record.url}>{text}</a>
+          <a href={record.url} target='_blank'>{text}</a>
         )
       }
     },{
@@ -305,7 +308,7 @@ class NestedTable extends React.Component {
       }
     }).then(text => {
       message.success(text);
-      // this.onExpand();
+      this.getTopicList();
     })
   }
   // 隐藏弹窗
@@ -314,6 +317,35 @@ class NestedTable extends React.Component {
       addEventModalVisible: false,
       collectModalVisible: false
     })
+  }
+  // 记录选择
+  onSelectChange(selectedRowKeys) {
+    this.setState({
+      selectedRowKeys
+    })
+    console.log('selectedRowKeys', selectedRowKeys);
+  }
+  // 删除专题
+  handleDelSpecial() {
+    let { selectedRowKeys } = this.state;
+    let { token } = this.props;
+    console.log('要刪除的专题ID', selectedRowKeys);
+
+    let result = deleteSpecial(selectedRowKeys, token);
+    result.then(resp =>{
+      if (resp.ok) {
+        return resp.text()
+      } else {
+        message.error('删除专题过程发生错误');
+      }
+    }).then(text =>{
+      message.success(text);
+      this.getTopicList();
+    }).catch(ex =>{
+      console.log('删除专题过程发生错误', ex.message);
+    })
+
+
   }
   render() {
 
@@ -331,16 +363,27 @@ class NestedTable extends React.Component {
       dataIndex: 'rules'
     }];
     const { user, token } = this.props;
+    const { selectedRowKeys } = this.state;
+    const rowSelection = {
+      selectedRowKeys,
+      onChange: this.onSelectChange.bind(this),
+    };
     return (
       <div className='clear-fix tableWrap'>
         <p className='section-header'>
-          专题列表 
+          专题列表
+          <Button 
+            type='primary'
+            disabled={!selectedRowKeys.length}
+            onClick={this.handleDelSpecial.bind(this)}
+           className='table-right-btn'>删除</Button>
           <Button 
             type='primary'
             onClick={this.handleAddSpecial.bind(this)}
            className='table-right-btn'>添加专题</Button>
         </p>
         <Table
+          rowSelection={rowSelection}
           rowKey="key"
           className="components-table-demo-nested table-style"
           loading={this.state.loading}
