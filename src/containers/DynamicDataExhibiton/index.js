@@ -5,11 +5,10 @@ import PureRenderMixin from 'react-addons-pure-render-mixin'
 import { DatePicker, Select, message } from 'antd';
 import moment from 'moment';
 import Chart from '../../components/Chart';
-import DynamicChart from '../../components/DynamicChart';
+
 import format from './subpage/format';
 
 import getChartData from '../../fetch/chartData';
-import getDynamicChartData from '../../fetch/chartTopicData';
 const RangePicker = DatePicker.RangePicker;
 
 import './style.less';
@@ -22,8 +21,7 @@ class DataExhibition extends React.Component{
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
         this.state = {
             data: false,
-            isLoading: true,
-            dynamicData: []
+            isLoading: true
         }
     }
     getChartList(startTime, endTime) {  // 传入起止日期
@@ -58,29 +56,10 @@ class DataExhibition extends React.Component{
             console.error('图表获取数据时，token加载失败');
         }
     }
-    // 动态图表
-    getDynamicChart() {
-        let { urls, token } = this.props;
-        let result = getDynamicChartData(urls, token);
-
-        result.then(resp =>{
-            if (resp.ok) {
-                return resp.json();
-            }
-        }).then(dynamicData =>{
-            // console.log('dynamic data', dynamicData);
-            this.setState({dynamicData});
-        })
-    }
     componentDidMount(){
         let startTime = format((new Date()).getTime()-60*24*60*60*1000, "MM/dd/yyyy");
         let endTime = format((new Date()).getTime(), "MM/dd/yyyy");
-        let { dynamic } = this.props;
-        if (!!dynamic) {
-            this.getDynamicChart();
-        } else {
-            this.getChartList(startTime, endTime);
-        }
+        this.getChartList(startTime, endTime);
     }
 
     // 日期变化时 
@@ -95,10 +74,8 @@ class DataExhibition extends React.Component{
     handleSelectChange(value) {
         console.log(value);
     }
-    
+
     render(){
-        const { dynamic } = this.props;
-        const { dynamicData, data } = this.state;
         return(
             <div className='container-flex' id='DataExhibition-container'>
             <p className='section-header'>舆情趋势折线图</p>
@@ -114,21 +91,16 @@ class DataExhibition extends React.Component{
                       <Option value="disabled" disabled>微博</Option>
                     </Select>
                 </span>
-                {
-                    !dynamic ? <span>起止日期: 
-                    <RangePicker 
+                
+                起止日期： 
+                <RangePicker 
                     defaultValue={[moment().subtract(60, 'days'), moment()]}
                     ranges={{Today: [moment(), moment()], 'This Month': [moment(), moment().endOf('month')] }}
                     format='YYYY-MM-DD'
-                    onChange={this.handleDateChange.bind(this)} /></span> : ''
-                }
-                
+                    onChange={this.handleDateChange.bind(this)} />
             </div>
-            {
-              !dynamic ? <Chart data={data} isLoading={this.state.isLoading}/> : 
-                <DynamicChart dynamicData={dynamicData} />
-            }
-             
+
+             <Chart  data={this.state.data} isLoading={this.state.isLoading}/>
 
             </div>
 

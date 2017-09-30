@@ -142,7 +142,11 @@ class NestedTable extends React.Component {
       }
      */
     let data = await this.getEventList(id, pagination.current);
-
+    data.eventPageList = data.eventPageList.map((item, index)=>
+      Object.assign({}, item, {
+        parentTableId: id,  // 数据的双向绑定
+      })
+    )
     // 更新缓存
     preCacheData.push({page: pagination.current, value: data});
     cacheData.set(id, preCacheData);
@@ -161,13 +165,17 @@ class NestedTable extends React.Component {
     })
     // console.log('data after connect', concatedData);
   }
+
   // 点击归集按钮时
   handleClickCollectionAction(currentCowData) {
+    let { topicList } = this.state;
+    // 更新状态
     this.setState({
       currentCowData,
       collectModalVisible: true,
     })
   }
+
   componentWillMount() {
     this.getTopicList();
   }
@@ -233,7 +241,8 @@ class NestedTable extends React.Component {
               region: item.region.join(','),
               subpage: {
                 eventPageList: [],
-                pages: 0
+                pages: 0,
+                currentPage: 1,
               }
             })
         })
@@ -267,14 +276,18 @@ class NestedTable extends React.Component {
       message.error('没有相关数据');
       return;
     }
-     // 推入缓存
+    // data.parentTableId = record.id;
+    // 推入缓存
     cacheData.set(id, [{page: 1, value: data}]);
 
     // 转换时间戳
     console.log('data', data);
     data.eventPageList = data.eventPageList.map((item, index)=>{
-      return Object.assign({}, item, { postTime: format(item.postTime, 'MM-dd hh:mm')})
-    }) 
+      return Object.assign({}, item, { 
+        postTime: format(item.postTime, 'MM-dd hh:mm'), 
+        parentTableId: record.id,  // 数据的双向绑定
+      })
+    })
     // 更新数据
     this.setState({
       topicList: this.concatTopicList(topicList, data, id)
@@ -293,22 +306,49 @@ class NestedTable extends React.Component {
   handleConnectAction(obj) {
     console.log('归集对象: ', obj);
     let { user, token } = this.props;
+    let { bindId, mainView, postType } = obj;
+
+    // console.log('cacheData.get(bindId)', cacheData.get(bindId));
+    // return;
     let result = collect({
       url:obj.id,
       body: {
         recorder: user,
-        mainView: obj.mainView,
-        postType: obj.postType
+        mainView,
+        postType,
       }
     }, token, fetchType.FETCH_TYPE_POST_URL2PARAMS);
+
 
     result.then(resp=>{
       if (resp.ok){
         return resp.text()
       }
     }).then(text => {
+      // this.getTopicList();
+      let collectId = obj.id;
+      let { topicList } = this.state;
+      let updataCowData = topicList.map((ListItem, index)=>{
+        return Object.assign({}, ListItem, 
+          { 
+            subpage: {
+              eventPageList: ListItem.subpage.eventPageList.map((item, index)=>{
+                if (item.id!==collectId) { return item }
+                else { return Object.assign({}, item, {collectionStatus: 1})}
+              }),
+              pages: ListItem.subpage.pages
+            }
+          })
+      })
+
+      // 更新缓存
+      cacheData.set(bindId, []);
+
+      // 更新状态
+      this.setState({
+        topicList: updataCowData,
+      })
       message.success(text);
-      this.getTopicList();
     })
   }
   // 隐藏弹窗

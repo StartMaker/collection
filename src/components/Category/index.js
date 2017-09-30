@@ -23,7 +23,7 @@ class Category extends React.Component{
                   <Menu.Item key='ana'>舆情监测</Menu.Item>
                   <Menu.Item key='handle'>舆情处置</Menu.Item>
                   <Menu.Item key='special'>专题事件</Menu.Item>
-                  <Menu.Item key='top' disabled>专贴分析</Menu.Item>
+                  <Menu.Item key='topic'>专贴分析</Menu.Item>
             </Menu>
 
         )
