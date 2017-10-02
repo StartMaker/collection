@@ -1,13 +1,16 @@
 import  React from 'react';
 import { Link } from 'react-router';
 import PureRenderMixin from 'react-addons-pure-render-mixin'
-import { Card, Button, Switch, Icon  } from 'antd';
+import { Card, Button, Switch, Icon, Popconfirm } from 'antd';
 
+import EditableInput from '../../EditableInput';
+import addTopic from '../../../fetch/addTopic';
 import './style.less';
 
 const gridStyle = {
   width: '90%',
   padding: 0,
+  marginLeft: 16,
   // textAlign: 'center',
 };
 /*
@@ -25,18 +28,57 @@ class TopicItem extends React.Component{
     constructor(props, context){
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+        this.state = {
+            urls: []
+        }
     }
+    componentDidMount() {
+        const { data } = this.props; 
+        this.setState({
+            urls: data.url
+        })
+    }
+    handleDeleteAction(...args) {
+        this.props.handleDelete(args[0].id);
+    }
+    handleSwitchAction(checked, id) {
+        this.props.handleSwitch(checked, id);
+    }
+    onCheckValue(index, value) {
+        // console.log('...args', args);
+        let { urls } = this.state;
+        let { data } = this.props;
+        urls = urls.map((item, itemIndex)=>{
+                if (itemIndex===index) {
+                    return value
+                } else {return item}
+            });
+        this.setState({urls });
+        this.props.onCheckValueAction({
+            id: data.id,
+            url: urls,
+        })
+        
+    }
+
     render(){
         const { data } = this.props; 
-        console.log('V', data);
+        // console.log('V', data);
         return(
             <Card.Grid id='TopicItem-wrap'>
-                <Switch className='TopicItem-switch-btn' size='small'/>
-                <Icon type='close' className='TopicItem-icon-delete'/>
+                <Switch defaultChecked={true} className='TopicItem-switch-btn' size='small' onChange={this.handleSwitchAction.bind(this, data.id)}/>
+                <Popconfirm title="Are you sure？" onConfirm={this.handleDeleteAction.bind(this, data)} okText="Yes" cancelText="No">
+                    <Icon type='close' className='TopicItem-icon-delete'/>
+                </Popconfirm>
                 <p className='TopicItem-header'>{data.name}</p>
                 <p className='TopicItem-url-container'>
                 {
-                    data.url.map((item, index)=><p key={index} className='TopicItem-url'>{item}</p>)
+                    data.url.map((item, index)=>
+                        <EditableInput 
+                            key={index}
+                            onChange={this.onCheckValue.bind(this, index)}
+                            value={item}/>
+                    )
                 }
                 </p>
                     

@@ -5,7 +5,7 @@ import { Form, Icon, Input, Button, message, Modal  } from 'antd';
 
 import TagInput from '../../../../components/TagInput';
 
-import addTopic from '../../../../fetch/addTopic';
+import addSpecial from '../../../../fetch/addSpecial';
 const FormItem = Form.Item;
 import './style.less';
 
@@ -36,7 +36,7 @@ class IncreaseEventWrap extends React.Component{
             message.error('input null');
             return;
         }
-        let result = addTopic({id: 0, name: topicName, region, rules}, token);
+        let result = addSpecial({id: 0, name: topicName, region, rules}, token);
         result.then(resp =>{
             if (resp.ok) {
                 return resp.text()

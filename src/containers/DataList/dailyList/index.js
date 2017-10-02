@@ -200,12 +200,6 @@ class DailyDataList extends React.Component{
             currentCowData: record
         })
     } 
-    handleConnectAction() {
-        console.log('connetion');
-        this.setState({
-            visible: false
-        })
-    }
     handleModalCancelAction() {
         console.log('cancel');
         this.setState({
@@ -267,7 +261,7 @@ class DailyDataList extends React.Component{
                  width='935px'
                  visible={this.state.visible}
                  title='待归集事件'
-                 onOk={this.handleConnectAction.bind(this) }
+                 onOk={this.handleModalCancelAction.bind(this) }
                  onCancel={this.handleModalCancelAction.bind(this)}
                  >
                      { /* 归集 */} 

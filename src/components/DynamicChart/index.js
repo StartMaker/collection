@@ -171,7 +171,7 @@ class DynamicChart extends React.Component{
         }
         let xAxis = [];
 
-        let colors = ['#666600', '#CCCC33', '#FFFFCC', '#999', '#663300'];
+        let colors = ['#af56d7', '#32a0fc', '#32a0fc', '#f67a40', '#fa3339'];
 
         // console.log('setOptions(data)', data);
 

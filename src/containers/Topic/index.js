@@ -6,20 +6,24 @@ import { bindActionCreators } from 'redux';
 import Header from '../Head';
 import DataExhibition from '../DataExhibition';
 
-import { Button } from 'antd';
+import { Button, Row, Col } from 'antd';
 // // import getMockData from '../../fetch/easyMockTest';
 
 import * as userInfoActionsFromOtherFile from '../../actions/userinfo.js';
+
 import TopicList from './subpage/TopicList';
+import EventsByTopicList from './subpage/EventsByTopicList';
 // import DailyDataList from '../DataList/dailyList';
-// 
-import TweenoneFourthDemo from '../../components/testCom/TweenoneFourthDemo';
+import './style.less'; 
+// import TweenoneFourthDemo from '../../components/testCom/TweenoneFourthDemo';
 
 class Topic extends React.Component{
     constructor(props, context){
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-
+        this.state = {
+            ids: []
+        }
     }
     componentDidMount() {
         if (this.props.userinfo.username == null ) { // 判断用户登录情况
@@ -36,6 +40,23 @@ class Topic extends React.Component{
             console.log('mock data', json);
         })
     }
+    // 根据用户选取专贴获取数据
+    handleChoseTopic(checked, targetIds) {
+        // console.log('checked, targetIds', checked, targetIds);
+        let { ids } = this.state;
+        if (checked) {
+            this.setState({
+                ids: ids.concat(targetIds)
+            });
+        } else {
+            this.setState({
+                ids: ids.filter((item, index)=>
+                    item!==targetIds ? true : false
+                )
+            })
+        }
+
+    }
     render(){
         // const { role, username } = this.props.userinfo;
         // console.log('this.props.userinfo', this.props.userinfo);
@@ -48,8 +69,20 @@ class Topic extends React.Component{
             <div>
                 <Header user= { username } role={ role } selectedKeys='topic'/> { /* 头部 */}
                 <DataExhibition urls={testUrls} token={this.props.userinfo.token} dynamic={true} />  { /* 图表 */}
-                <TopicList token={this.props.userinfo.token} />
-                
+                <Row id='topicDataListContainer' gutter={16}>
+                    <Col span={8} className="gutter-row">
+                        <TopicList
+                            
+                            onChoseTopic={this.handleChoseTopic.bind(this)} 
+                            token={this.props.userinfo.token} />
+                    </Col>
+                    <Col span={16} className="gutter-row"> 
+                        <EventsByTopicList  
+                            ids={this.state.ids}
+                            token={this.props.userinfo.token}
+                            user={ username }/>
+                    </Col>
+                </Row>
             </div>
         )
     }

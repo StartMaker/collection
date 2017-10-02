@@ -10,6 +10,7 @@ import DataExhibition from '../DataExhibition';
 import * as userInfoActionsFromOtherFile from '../../actions/userinfo.js';
 
 import DailyDataList from '../DataList/dailyList';
+
 class Analyse extends React.Component{
     constructor(props, context){
         super(props, context);

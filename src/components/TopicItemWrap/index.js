@@ -15,31 +15,30 @@ class TopicItemWrap extends React.Component{
     componentWillMount() {
 
     }
-
-    handleChoseAction(info) {
-        this.props.handleChoseAction(info);
+    handleChoseAction(checked, id) {
+        this.props.handleChoseAction(checked, id);
     }
-    handleDeleteAction(info) {
-        this.props.handleDeleteAction(info);
+    handleDeleteAction(id) {
+        this.props.handleDeleteAction(id);
+    }
+    handleAddTopicAction() {
+        this.props.handleAddTopicAction();
+    }
+    handleCheckValue(modifyTopicObj) {
+        this.props.onCheckValueAction(modifyTopicObj);
     }
     render(){
         let { data } = this.props;
         itemList.length = 0;
-        data.forEach((item, index)=>{
-            itemList.push(
-                <TopicItem data={item} 
-                    onDelete={this.handleDeleteAction.bind(this)}
-                    onChose={this.handleChoseAction.bind(this)}/>
-            )
-        })
         return(
-            <Card loading={false} title="专贴列表" noHovering extra={<Button>Add Topic</Button>}>
+            <Card loading={false} title="专贴列表" noHovering extra={<Button onClick={this.handleAddTopicAction.bind(this)}>Add Topic</Button>}>
               {
                 data.map((item, index)=>
-                    <TopicItem data={item} 
+                    <TopicItem data={item}
+                        onCheckValueAction={this.handleCheckValue.bind(this)}
                         key={index}
-                        onDelete={this.handleDeleteAction.bind(this)}
-                        onChose={this.handleChoseAction.bind(this)}/>
+                        handleDelete={this.handleDeleteAction.bind(this)}
+                        handleSwitch={this.handleChoseAction.bind(this)}/>
                 )
               }
             </Card >
