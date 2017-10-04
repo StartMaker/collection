@@ -32,6 +32,7 @@ class TableWrap extends React.Component{
             <div>
                 <Table
                 rowKey='uid'
+                rowSelection={this.props.rowSelection || null}
                 onRowDoubleClick={ this.handleDoubleClickRowAction.bind(this) }
                 rowSelection={rowSelection||''}  
                 className='table-style'

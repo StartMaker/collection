@@ -22,7 +22,8 @@ class Topic extends React.Component{
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
         this.state = {
-            ids: []  // 通过修改id的值，触发专贴事件的刷新
+            ids: [],  // 通过修改id的值，触发专贴事件的刷新
+            urls: []
         }
     }
     componentDidMount() {
@@ -40,24 +41,7 @@ class Topic extends React.Component{
             console.log('mock data', json);
         })
     }
-    // 根据用户选取专贴获取数据
-    handleChoseTopic(checked, targetIds) {
-        // console.log('checked, targetIds', checked, targetIds);
-        let { ids } = this.state;
-        if (checked) {
-            this.setState({
-                ids: ids.concat(targetIds)
-            });
-        } else {
-            this.setState({
-                ids: ids.filter((item, index)=>
-                    item!==targetIds ? true : false
-                )
-            })
-        }
-    }
     // ids 单一功能原则
-    // 新增专贴
     modifyIdsAction(newID) {
     // 通过修改id的值，触发专贴事件的刷新
         // let { ids } = this.state;
@@ -66,6 +50,15 @@ class Topic extends React.Component{
             ids: newID
         })
     }
+    modifyUrlsAction(newUrls) {
+    // urls 与图表绑定
+        console.log('newUrls', newUrls);
+
+        this.setState({
+            urls: newUrls
+        })
+    }
+
     render(){
         // const { role, username } = this.props.userinfo;
         // console.log('this.props.userinfo', this.props.userinfo);
@@ -73,20 +66,20 @@ class Topic extends React.Component{
         const role = userinfo.role;
         const username = userinfo.username;
         // console.log('username',username);
-        const testUrls = ["http://tieba.baidu.com/p/5335559380","http://tieba.baidu.com/p/5347033044","http://tieba.baidu.com/p/5345718981"];
+        // const testUrls = ["http://tieba.baidu.com/p/5335559380","http://tieba.baidu.com/p/5347033044","http://tieba.baidu.com/p/5345718981"];
         return(
             <div>
                 <Header user= { username } role={ role } selectedKeys='topic'/> { /* 头部 */}
-                <DataExhibition urls={testUrls} token={this.props.userinfo.token} dynamic={true} />  { /* 图表 */}
+                <DataExhibition urls={this.state.urls} token={this.props.userinfo.token} dynamic={true} />  { /* 图表 */}
                 <Row id='topicDataListContainer' gutter={16}>
                     <Col span={8} className="gutter-row">
                         <TopicList
                             modifyIds={this.modifyIdsAction.bind(this)}
-                            onChoseTopic={this.handleChoseTopic.bind(this)} 
                             token={this.props.userinfo.token} />
                     </Col>
                     <Col span={16} className="gutter-row"> 
-                        <EventsByTopicList  
+                        <EventsByTopicList
+                            modifyUrls={this.modifyUrlsAction.bind(this)}
                             ids={this.state.ids}
                             token={this.props.userinfo.token}
                             user={ username }/>

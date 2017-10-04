@@ -23,7 +23,8 @@ class DataExhibition extends React.Component{
         this.state = {
             data: false,
             isLoading: true,
-            dynamicData: []
+            dynamicData: [],
+            urls: [],
         }
     }
     getChartList(startTime, endTime) {  // 传入起止日期
@@ -59,10 +60,10 @@ class DataExhibition extends React.Component{
         }
     }
     // 动态图表
-    getDynamicChart() {
-        let { urls, token } = this.props;
+    getDynamicChart(urls=[]) {
+        let { token } = this.props;
         let result = getDynamicChartData(urls, token);
-
+        console.log('getDynamicChart');
         result.then(resp =>{
             if (resp.ok) {
                 return resp.json();
@@ -82,7 +83,15 @@ class DataExhibition extends React.Component{
             this.getChartList(startTime, endTime);
         }
     }
+    componentWillUpdate(preProps, preState) {
+        let { dynamic } = this.props; 
+        if(dynamic) {
+            if (preProps.urls.length!==this.props.urls.length) {
+                this.getDynamicChart(preProps.urls);
+            }
 
+        }
+    }
     // 日期变化时 
     handleDateChange(dates, dateStrings) {
         // console.log('From: ', dates[0], 'To', dates[1]); 

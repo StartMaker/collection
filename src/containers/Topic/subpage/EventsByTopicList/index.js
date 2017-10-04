@@ -22,6 +22,8 @@ class EventsByTopicList extends React.Component{
           currentCowData: {},
           loading: true,
           visible: false,
+          selectedRowKeys: [],
+          urls: [],
         }
     this.columns = [{
           title: '主题',
@@ -136,11 +138,36 @@ class EventsByTopicList extends React.Component{
         this.getDataList(ids);
       }
     }
+    updataUrls(newUrls) {
+      this.setState({
+        urls: newUrls
+      })
+      this.props.modifyUrls(newUrls);
+    }
+    // 选中时
+    onSelectChange(selectedRowKeys, selectedRows) {
+      // console.log('选中对象', selectedRows);
+      if (selectedRowKeys.length <= 5) {
+        let urls = selectedRows.map((item, indxe)=>item.url);
+        // 勾选动作
+        this.setState({selectedRowKeys});
+        // 更新选中折线
+        this.updataUrls(urls);
+      } else {
+        message.error('至多选择五条');
+      }
+    }
     render(){
+      const { selectedRowKeys } = this.state; 
+      const rowSelection = {
+        selectedRowKeys,
+        onChange: this.onSelectChange.bind(this),
+      };
       const { currentCowData, loading, visible } = this.state;
         return(
             <div>
                 <TableWrap
+                rowSelection={rowSelection}
                 {...this.state}
                 columns={this.columns}
                 clickOtherPageAction={this.otherPageAction.bind(this)}/>

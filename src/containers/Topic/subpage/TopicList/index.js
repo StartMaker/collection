@@ -30,7 +30,11 @@ class TopicList extends React.Component{
       
     }
     // 获取专贴列表
-    getTopicListAction(cacheID) {
+    /*
+    modifyInfo: boolean, true 增加专贴, false 删除专贴
+    cacheID: array, 用户选择的情况
+     */
+    getTopicListAction(cacheID, modifyInfo) {
       let { token } = this.props;
       let result = getTopicList('', token);
       // let ids = [];
@@ -42,12 +46,17 @@ class TopicList extends React.Component{
         this.setState({data});
         console.log('datadatadata', data);
         if (!cacheID) {
-          updateIds(data.map((item, index)=>item.id))
+          // 初始全选
+          this.updateIds(data.map((item, index)=>item.id))
         } else {
           // 刷新逻辑
-          //  ??? 
-          cacheID.concat(data[data.length].id);
-          updateIds(cacheID.concat(data[data.length].id));
+          if (modifyInfo) {
+            // 增加专贴
+            this.updateIds(cacheID.concat(data[data.length-1].id));
+          } else {
+            // 删除专贴
+            this.updateIds(cacheID);
+          }
         }
       })
     }
@@ -64,7 +73,8 @@ class TopicList extends React.Component{
         }
       }).then(text =>{
         message.success(text);
-        this.getTopicListAction();
+        let cacheID = this.state.ids;
+        this.getTopicListAction(cacheID.filter((item, index)=>item !== id ? true : false, false));
       }).catch(ex =>{
         console.log('删除对象时发生了一个错误', ex.message);
       })
@@ -76,16 +86,15 @@ class TopicList extends React.Component{
        let { ids } = this.state;
        let newIds = checked ? ids.concat(targetIds) : ids.filter((item, index)=>item!==targetIds ? true : false);
 
-        updateIds(newIds);
-      // this.props.onChoseTopic(checked, id);
+        this.updateIds(newIds);
     }
     // 更新ids
     updateIds(newIDs) {
       this.setState({
-          ids: newIds
+          ids: newIDs
       });
       // 向上传递ids
-      this.props.modifyIds(newIds);
+      this.props.modifyIds(newIDs);
     }
     handleAddTopicModal() {
       this.setState({
@@ -147,7 +156,8 @@ class TopicList extends React.Component{
       }).then(text =>{
         if (text=='添加成功') {
           message.success(text);
-          this.getTopicListAction();
+          // 传入之前用户选择
+          this.getTopicListAction(this.state.ids, true);
         } else {
           message.error('添加失败');
         }
