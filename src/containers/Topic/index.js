@@ -22,7 +22,7 @@ class Topic extends React.Component{
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
         this.state = {
-            ids: []
+            ids: []  // 通过修改id的值，触发专贴事件的刷新
         }
     }
     componentDidMount() {
@@ -55,7 +55,16 @@ class Topic extends React.Component{
                 )
             })
         }
-
+    }
+    // ids 单一功能原则
+    // 新增专贴
+    modifyIdsAction(newID) {
+    // 通过修改id的值，触发专贴事件的刷新
+        // let { ids } = this.state;
+        // console.log('newId', newID);
+        this.setState({
+            ids: newID
+        })
     }
     render(){
         // const { role, username } = this.props.userinfo;
@@ -72,7 +81,7 @@ class Topic extends React.Component{
                 <Row id='topicDataListContainer' gutter={16}>
                     <Col span={8} className="gutter-row">
                         <TopicList
-                            
+                            modifyIds={this.modifyIdsAction.bind(this)}
                             onChoseTopic={this.handleChoseTopic.bind(this)} 
                             token={this.props.userinfo.token} />
                     </Col>

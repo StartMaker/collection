@@ -19,6 +19,7 @@ class TopicList extends React.Component{
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
         this.state = {
           data: [],
+          ids: [],
           visible: false,
         }
     }
@@ -28,7 +29,8 @@ class TopicList extends React.Component{
     componentDidMount() {
       
     }
-    getTopicListAction() {
+    // 获取专贴列表
+    getTopicListAction(cacheID) {
       let { token } = this.props;
       let result = getTopicList('', token);
       // let ids = [];
@@ -39,9 +41,17 @@ class TopicList extends React.Component{
       }).then(data=>{
         this.setState({data});
         console.log('datadatadata', data);
-        this.props.onChoseTopic(true, data.map((item, index)=>item.id));
+        if (!cacheID) {
+          updateIds(data.map((item, index)=>item.id))
+        } else {
+          // 刷新逻辑
+          //  ??? 
+          cacheID.concat(data[data.length].id);
+          updateIds(cacheID.concat(data[data.length].id));
+        }
       })
     }
+    // 删除专贴
     handleDelete(id) {
       console.log('删除对象的id：', id);
       let { token } = this.props;
@@ -60,10 +70,22 @@ class TopicList extends React.Component{
       })
 
     }
-
-    handleChose(id, checked) {
+    // 根据用户选择更新ids
+    handleChose(targetIds, checked) {
       // console.log(x);
-      this.props.onChoseTopic(checked, id);
+       let { ids } = this.state;
+       let newIds = checked ? ids.concat(targetIds) : ids.filter((item, index)=>item!==targetIds ? true : false);
+
+        updateIds(newIds);
+      // this.props.onChoseTopic(checked, id);
+    }
+    // 更新ids
+    updateIds(newIDs) {
+      this.setState({
+          ids: newIds
+      });
+      // 向上传递ids
+      this.props.modifyIds(newIds);
     }
     handleAddTopicModal() {
       this.setState({
@@ -81,6 +103,7 @@ class TopicList extends React.Component{
         visible: false
       })
     }
+     // 修改专贴事件
     handleCheckValue(modifyTopicObj) {
       console.log('modifyTopicObj', modifyTopicObj);
       let { token } = this.props;
@@ -97,7 +120,7 @@ class TopicList extends React.Component{
         console.log('add topic ocurred an error ', ex.message)
       })
     }
-    // 添加或者修改专贴
+    // 添加专贴
     handleAddTopicRequestAction(value) {
       let { topicName } = value;
       let { token } = this.props;
@@ -111,8 +134,8 @@ class TopicList extends React.Component{
         }
       }
 
-
       console.log('handleAddTopicRequestAction', urls);
+
       let result = addTopic({
         name: topicName,
         url: urls

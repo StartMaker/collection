@@ -103,7 +103,7 @@ class EventsByTopicList extends React.Component{
         })
         let result = collect({
             url: id,
-            body: Object.assign({}, {recorder: user, table: 'str'}, info )
+            body: Object.assign({}, {recorder: user, table: 'special'}, info )
         }, token, fetchType.FETCH_TYPE_POST_URL2PARAMS );
         // 归集结果
         result.then(resp => {
