@@ -12,7 +12,6 @@ import IncreaseTopic from '../IncreaseTopic';
 
 import './style.less';
 
-
 class TopicList extends React.Component{
     constructor(props, context){
         super(props, context);
@@ -44,7 +43,7 @@ class TopicList extends React.Component{
         }
       }).then(data=>{
         this.setState({data});
-        console.log('datadatadata', data);
+        // console.log('datadatadata', data);
         if (!cacheID) {
           // 初始全选
           this.updateIds(data.map((item, index)=>item.id))
@@ -124,6 +123,8 @@ class TopicList extends React.Component{
           return resp.text()
         } 
       }).then(text=>{
+        let { ids } = this.state;
+        this.updateIds(ids.concat(Math.random()));
         message.success(text);
       }).catch(ex =>{
         console.log('add topic ocurred an error ', ex.message)
@@ -167,10 +168,11 @@ class TopicList extends React.Component{
     }
     render(){
       const { data } = this.state;
-      const { token } = this.props;
+      const { token, onUrls } = this.props;
         return(
             <div id='TopicList-wrap'>
-              <TopicItemWrap 
+              <TopicItemWrap
+                onUrls={onUrls}
                 handleAddTopicAction = {this.handleAddTopicModal.bind(this)}
                 handleDeleteAction = {this.handleDelete.bind(this)} 
                 handleChoseAction = {this.handleChose.bind(this)}

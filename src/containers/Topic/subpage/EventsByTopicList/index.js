@@ -7,7 +7,7 @@ import Collection from '../../../DataList/dailyList/subpage';
 import TableWrap from '../../../../components/TableWrap';
 import getTopicEvents from '../../../../fetch/topicEvents';
 import collect from '../../../../fetch/collect';
-
+import format from '../../../../containers/DataExhibition/subpage/format';
 import * as fetchType from '../../../../constants/fetchType';
 
 import './style.less';
@@ -45,7 +45,13 @@ class EventsByTopicList extends React.Component{
             dataIndex: 'postType',
         }, {
             title: '发帖时间',
-            dataIndex: 'postTime',
+            // dataIndex: 'postTime',
+            render: (text, record) => {
+              // console.log('時間对象', record);
+              return (
+                <span>{ format(record.createdTime, 'MM-dd hh:mm') }</span>
+                )
+            } 
         }, {
             title: '归集',
             dataIndex: 'operation',
@@ -70,7 +76,7 @@ class EventsByTopicList extends React.Component{
         visible: true,
       })
     }
-    // 根据页码获取数据
+    // 根据id获取数据
     getDataList(ids) {
         let { token } = this.props;
         let result = getTopicEvents({ids}, token);
@@ -81,7 +87,7 @@ class EventsByTopicList extends React.Component{
                 console.log('专贴列表获取错误：400');
             }
         }).then(data=>{
-            console.log('data', data);
+            console.log('getDataList', data);
             this.setState({
               data,
               loading: false,
@@ -118,7 +124,7 @@ class EventsByTopicList extends React.Component{
         }).then(text =>{
             if (text=== '归集成功') {
                 let { ids } = this.props;
-                message.success('归集成功！');
+                message.success(text);
                 getDataList(ids);
             } else {
                 message.error(`归集失败！${text}`);
@@ -146,7 +152,7 @@ class EventsByTopicList extends React.Component{
     }
     // 选中时
     onSelectChange(selectedRowKeys, selectedRows) {
-      // console.log('选中对象', selectedRows);
+      console.log('选中对象', selectedRows);
       if (selectedRowKeys.length <= 5) {
         let urls = selectedRows.map((item, indxe)=>item.url);
         // 勾选动作

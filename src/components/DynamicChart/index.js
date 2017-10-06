@@ -54,8 +54,8 @@ class DynamicChart extends React.Component{
                 myChart.hideLoading();
             }
             let options = this.setOptions(dynamicData);
-            // console.log('options data', options);
-            myChart.setOption(options);
+            // console.log(' options.series', options.series);
+            myChart.setOption(options, true);
         }
     }
     // 填充x轴
@@ -171,7 +171,7 @@ class DynamicChart extends React.Component{
         }
         let xAxis = [];
 
-        let colors = ['#af56d7', '#32a0fc', '#32a0fc', '#f67a40', '#fa3339'];
+        let colors = ['#af56d7', '#32a0fc', '#00b541', '#f67a40', '#fa3339'];
 
         // console.log('setOptions(data)', data);
 

@@ -62,17 +62,26 @@ class DataExhibition extends React.Component{
     // 动态图表
     getDynamicChart(urls=[]) {
         let { token } = this.props;
+        if (!urls.length) {
+            this.setState({dynamicData: []});
+            return;
+        }
+        // console.log('getDynamicChart');
         let result = getDynamicChartData(urls, token);
-        console.log('getDynamicChart');
         result.then(resp =>{
             if (resp.ok) {
                 return resp.json();
+            } else {
+                message.error('没有该资源');
             }
-        }).then(dynamicData =>{
+        }).then(dynamicData => {
             // console.log('dynamic data', dynamicData);
             this.setState({dynamicData});
+        }).catch(ex=>{
+            console.log('折线选择过程出现错误');
         })
     }
+    // 初始化拿到当前时间
     componentDidMount(){
         let startTime = format((new Date()).getTime()-60*24*60*60*1000, "MM/dd/yyyy");
         let endTime = format((new Date()).getTime(), "MM/dd/yyyy");
@@ -83,11 +92,15 @@ class DataExhibition extends React.Component{
             this.getChartList(startTime, endTime);
         }
     }
+    // 动态刷新折线
     componentWillUpdate(preProps, preState) {
         let { dynamic } = this.props; 
         if(dynamic) {
             if (preProps.urls.length!==this.props.urls.length) {
                 this.getDynamicChart(preProps.urls);
+                this.setState({
+                    urls: preProps.urls
+                })
             }
 
         }
@@ -118,9 +131,9 @@ class DataExhibition extends React.Component{
                     defaultValue='百度贴吧'
                     onChange={this.handleSelectChange.bind(this)}
                     >
-                     <Option value="jack">百度贴吧</Option>
-                      <Option value="lucy" disabled>微信</Option>
-                      <Option value="disabled" disabled>微博</Option>
+                     <Option value="tieba">百度贴吧</Option>
+                      <Option value="weixin" disabled>微信</Option>
+                      <Option value="weibo" disabled>微博</Option>
                     </Select>
                 </span>
                 {

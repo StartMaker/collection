@@ -62,11 +62,19 @@ class TopicItem extends React.Component{
     }
 
     render(){
-        const { data } = this.props; 
+        const { data, onUrls } = this.props; 
         // console.log('V', data);
+        let switchDisabled = !!data.url.filter((item, index)=>{
+            return onUrls.indexOf(item)>=0 ? true : false
+        }).length ? true : false
         return(
             <Card.Grid id='TopicItem-wrap'>
-                <Switch defaultChecked={true} className='TopicItem-switch-btn' size='small' onChange={this.handleSwitchAction.bind(this, data.id)}/>
+                <Switch 
+                    defaultChecked={true} 
+                    className='TopicItem-switch-btn' 
+                    disabled={switchDisabled}
+                    size='small' 
+                    onChange={this.handleSwitchAction.bind(this, data.id)}/>
                 <Popconfirm title="Are you sure？" onConfirm={this.handleDeleteAction.bind(this, data)} okText="Yes" cancelText="No">
                     <Icon type='close' className='TopicItem-icon-delete'/>
                 </Popconfirm>
