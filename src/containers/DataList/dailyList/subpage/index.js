@@ -106,12 +106,14 @@ class Collection extends React.Component{
       this.setState({
         loading: true
       });
+      let { table } = this.props;
       let bindId = this.props.data[0].parentTableId || '' ;
       const { mainView, postType, id } = this.state; 
       this.props.handleConnection({
         mainView,
         postType,
         id,
+        table,
         bindId // 数据的双向绑定
       });
 

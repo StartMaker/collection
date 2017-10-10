@@ -265,7 +265,8 @@ class DailyDataList extends React.Component{
                  onCancel={this.handleModalCancelAction.bind(this)}
                  >
                      { /* 归集 */} 
-                 <Collection 
+                 <Collection
+                    table='daily'
                     loading= {this.state.loading}
                     data={[this.state.currentCowData]}
                     handleCancel={this.handleModalCancelAction.bind(this)}

@@ -12,7 +12,7 @@ import IncreaseTopic from '../IncreaseTopic';
 
 import './style.less';
 
-class TopicList extends React.Component{
+class TopicList extends React.Component {
     constructor(props, context){
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
@@ -200,6 +200,7 @@ class TopicList extends React.Component{
 
         )
     }
+
 }
                    // afterAdd={this.updataTopicList.bind(this)}
 

@@ -1,5 +1,8 @@
 import React from 'react';
-import { Router, Route, IndexRoute } from 'react-router';
+import { Router, Route, IndexRoute, hashHistory } from 'react-router';
+
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
 import Analyse from '../containers/Analyse';  // 舆情分析
 import Handle from '../containers/Handle'; // 舆情处置
@@ -9,13 +12,22 @@ import Login from '../containers/Login';
 import NotFound from '../containers/Notfound';
 import App from '../containers/App'
 
-class RouteMap extends React.Component {
+import { Affix, Button } from 'antd';
 
-updateHandle() { 
-    console.log('记录PV');
-    //PV统计
-}
+let count = 0 ;
+class RouteMap extends React.Component {
+    constructor(props, context) {
+        super(props, context);
+        this.state = {
+            play: true
+        }
+    }
+    updateHandle() { 
+        console.log('记录PV');
+        //PV统计
+    }
      render() {
+
         return ( 
             <Router 
              history={this.props.history} 
@@ -33,6 +45,23 @@ updateHandle() {
             ) 
     } 
 }
+// 连接redux
+
+// {
+//                  
+
+//                 }
+
+// function mapStateToProps(state) {
+//     return {
+//         userinfo: state.userinfo
+//     }
+// }
+
+
+// export default connect(
+//     mapStateToProps
+// )(RouteMap);
 
 export default RouteMap;
 

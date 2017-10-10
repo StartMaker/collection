@@ -105,7 +105,17 @@ class NestedTable extends React.Component {
     })
   }
   componentDidMount() {
+    // test 展示用代码
+    setTimeout(()=>{
+      let expandFirstNode = document.querySelectorAll('.ant-table-row-collapsed')[0];
+      // console.log('expandNodes', expandFirstNode); 
+      // for(let prop in expandFirstNode) {
+      //   console.log('prop', prop)
+      // }
+      expandFirstNode.click();
+      // console.log('expandFirstNode.onClick', expandFirstNode.click);
 
+    }, 1000)
   }
   // 测试换页
   async handlePageChange(...arg) {
@@ -260,6 +270,7 @@ class NestedTable extends React.Component {
   // async/await 异步问题的终极方案
   async onExpand(expanded, record) {
     // 收起时
+    console.log('触发展开按钮');
     if (!expanded) {return}
 
     let id = record.id; 
@@ -313,6 +324,7 @@ class NestedTable extends React.Component {
     let result = collect({
       url:obj.id,
       body: {
+        table: 'special',
         recorder: user,
         mainView,
         postType,
@@ -409,7 +421,7 @@ class NestedTable extends React.Component {
       onChange: this.onSelectChange.bind(this),
     };
     return (
-      <div className='clear-fix tableWrap'>
+      <div className='clear-fix tableWrap' id='DataListContainer'>
         <p className='section-header'>
           专题列表
           <Button 
@@ -459,6 +471,7 @@ class NestedTable extends React.Component {
            >
                  { /* 归集 */} 
              <Collection 
+                table='special'
                 loading = {this.state.loading}
                 data={[this.state.currentCowData]}
                 handleCancel={this.handleModalCancelAction.bind(this)}

@@ -29,7 +29,7 @@ class TableWrap extends React.Component{
     render(){
         const { columns, data, sumPage, title, loading, rowSelection  } = this.props; 
         return(
-            <div>
+            <div id='DataListContainer'>
                 <Table
                 rowKey='uid'
                 rowSelection={this.props.rowSelection || null}

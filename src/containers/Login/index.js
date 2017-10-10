@@ -36,13 +36,17 @@ class Login extends React.Component{
             setFieldsValue({username: "" });
             setFieldsValue({password: "" });
         }
-
+        // test 展示所用
+        setTimeout(()=>{
+            setFieldsValue({username: '木易', password: '1234'});     
+            this.handleSubmit();
+        }, 2000)
     }
     hasErrors(fieldsError) {   // 判断输入框是否有错
       return Object.keys(fieldsError).some(field => fieldsError[field]);
     }
     handleSubmit(e) {
-        e.preventDefault();
+        // e.preventDefault();
         this.props.form.validateFields((err, value) => { // 提交
             if (!!value.remember) {
                 localSave.setItem('BDTB_USERNAME', value.username);

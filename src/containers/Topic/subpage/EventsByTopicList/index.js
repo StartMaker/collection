@@ -16,7 +16,7 @@ class EventsByTopicList extends React.Component{
         super(props, context);
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
         this.state = {
-          data: '',
+          data: [],
           currentPage: 1,
           sumPage: 1,
           currentCowData: {},
@@ -49,7 +49,7 @@ class EventsByTopicList extends React.Component{
             render: (text, record) => {
               // console.log('時間对象', record);
               return (
-                <span>{ format(record.createdTime, 'MM-dd hh:mm') }</span>
+                <span>{ format(record.postTime, 'MM-dd hh:mm') }</span>
                 )
             } 
         }, {
@@ -65,9 +65,22 @@ class EventsByTopicList extends React.Component{
         }]
     }
     componentDidMount() {
-      // let { ids } = this.props;
-      // // console.log('componentDidMount ids', ids);
-      // this.getDataList(ids);
+      // 默认全选 硬编码
+      // test 展示所用
+      console.log('this.state.data', this.state.data);
+      let testArr = [{
+        url: "http://tieba.baidu.com/p/5352944669" 
+        },{
+        url: "http://tieba.baidu.com/p/5355042005" 
+        },{
+        url: "http://tieba.baidu.com/p/5360636695" 
+        },{
+        url: "http://tieba.baidu.com/p/5362845919" 
+        },{
+        url: "http://tieba.baidu.com/p/4131388771" 
+        }]
+      this.onSelectChange([0,1,2,3,4], testArr);
+    
     }
     // 显示弹框
     handleClickAction(currentCowData) {
@@ -151,8 +164,11 @@ class EventsByTopicList extends React.Component{
       this.props.modifyUrls(newUrls);
     }
     // 选中时
-    onSelectChange(selectedRowKeys, selectedRows) {
-      console.log('选中对象', selectedRows);
+    onSelectChange(selectedRowKeys, selectedRows=[]) {
+      // console.log('selectedRowKeys', selectedRowKeys);
+      console.log('selectedRows', selectedRows);
+      console.log('this.state.data', this.state.data);
+
       if (selectedRowKeys.length <= 5) {
         let urls = selectedRows.map((item, indxe)=>item.url);
         // 勾选动作

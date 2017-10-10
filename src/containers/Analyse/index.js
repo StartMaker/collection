@@ -11,6 +11,8 @@ import * as userInfoActionsFromOtherFile from '../../actions/userinfo.js';
 
 import DailyDataList from '../DataList/dailyList';
 
+import './style.less';
+
 class Analyse extends React.Component{
     constructor(props, context){
         super(props, context);
