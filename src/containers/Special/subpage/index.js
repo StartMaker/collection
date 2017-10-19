@@ -106,16 +106,7 @@ class NestedTable extends React.Component {
   }
   componentDidMount() {
     // test 展示用代码
-    setTimeout(()=>{
-      let expandFirstNode = document.querySelectorAll('.ant-table-row-collapsed')[0];
-      // console.log('expandNodes', expandFirstNode); 
-      // for(let prop in expandFirstNode) {
-      //   console.log('prop', prop)
-      // }
-      expandFirstNode.click();
-      // console.log('expandFirstNode.onClick', expandFirstNode.click);
 
-    }, 1000)
   }
   // 测试换页
   async handlePageChange(...arg) {
@@ -270,7 +261,7 @@ class NestedTable extends React.Component {
   // async/await 异步问题的终极方案
   async onExpand(expanded, record) {
     // 收起时
-    console.log('触发展开按钮');
+    // console.log('触发展开按钮');
     if (!expanded) {return}
 
     let id = record.id; 

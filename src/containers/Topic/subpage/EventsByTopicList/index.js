@@ -66,20 +66,9 @@ class EventsByTopicList extends React.Component{
     }
     componentDidMount() {
       // 默认全选 硬编码
-      // test 展示所用
-      console.log('this.state.data', this.state.data);
-      let testArr = [{
-        url: "http://tieba.baidu.com/p/5352944669" 
-        },{
-        url: "http://tieba.baidu.com/p/5355042005" 
-        },{
-        url: "http://tieba.baidu.com/p/5360636695" 
-        },{
-        url: "http://tieba.baidu.com/p/5362845919" 
-        },{
-        url: "http://tieba.baidu.com/p/4131388771" 
-        }]
-      this.onSelectChange([0,1,2,3,4], testArr);
+      // // test 展示所用
+      // console.log('this.state.data', this.state.data);
+
     
     }
     // 显示弹框
