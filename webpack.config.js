@@ -30,7 +30,7 @@ module.exports = {
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin(),
         new webpack.DefinePlugin({
-          __DEV__: JSON.stringify(JSON.parse((process.env.NODE_ENV == 'dev') || 'false'))
+          __DEV__: JSON.stringify(JSON.parse('true'))
         })
     ],
     postcss: [

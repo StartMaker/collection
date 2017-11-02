@@ -33,12 +33,14 @@ module.exports = {
         new webpack.optimize.UglifyJsPlugin({
             compressor: {
                 warnings: false,
-                screw_ie8: true
+                screw_ie8: true,
+                drop_console: true,
             }
         }),
         // plugin for passing in data to the js, like what NODE_ENV we are in.
         new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('production')
+            'process.env.NODE_ENV': JSON.stringify('production'),
+            __DEV__: JSON.stringify('false'),
         })
     ],
 

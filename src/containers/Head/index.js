@@ -29,7 +29,7 @@ class Head extends React.Component{
         // this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
         this.state = {
             current: this.props.selectedKeys,  // 默认选择页
-            privilege: true,
+            privilege: false,
             isDownLoadReport: false,  //是否在下载报表
             visible: false, // 权限管理 弹窗
             reportDate: {
@@ -39,7 +39,14 @@ class Head extends React.Component{
         }
     }
     componentDidMount() {
-        console.log('this.props' ,this.props);
+        const role = this.props.role;
+        // console.log('this.props' ,this.props);
+        
+        console.log('NODE_ENV', __DEV__);
+
+        if (role === 'ADMIN') {
+            this.setState({privilege: true})
+        }
     }
     // 点击时调用
     handleDiffPage(e){ 
@@ -51,7 +58,7 @@ class Head extends React.Component{
     }
     // 权限管理
     handleRightCom() {   
-        console.log('handleRightCom');
+        // console.log('handleRightCom');
         this.setState({
             visible: true
         })
