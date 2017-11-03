@@ -5,6 +5,7 @@ import {  Menu, Tabs } from 'antd';
 
 const SubMenu = Menu.SubMenu;
 
+import './style.less'
 class Category extends React.Component{
     constructor(props, context){
         super(props, context);
@@ -14,8 +15,11 @@ class Category extends React.Component{
         this.props.changePage(e)
     }
     render(){
+      const textStyle = {
+        fontSize: 16,
+      }
         return(
-            <Menu mode='horizontal'
+            <Menu id='category_container' style={textStyle} mode='horizontal'
                 onClick={e=> { this.handleDiffPage(e)} } 
                 selectedKeys={[this.props.current]} 
                 theme='light'

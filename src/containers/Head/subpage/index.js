@@ -61,7 +61,6 @@ class User extends React.Component{
                         onChange={this.mouthChange.bind(this)} 
                         placeholder='Select month '
                         defaultValue={moment(new Date(), 'yyyy-MM')}/>
-
                       <Button
                         className='head-report-btn'
                         icon='exception' 

@@ -24,7 +24,6 @@ class TableWrap extends React.Component{
         if ( this.props.handleDoubleClickRow ) {
             this.props.handleDoubleClickRow(info);
         }
-
     }
     render(){
         const { columns, data, sumPage, title, loading, rowSelection  } = this.props; 
