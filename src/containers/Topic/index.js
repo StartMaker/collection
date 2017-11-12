@@ -52,10 +52,10 @@ class Topic extends React.Component{
     // 事件列表选择
     modifyUrlsAction(selectedRows) {
         // console.log('newUrls', newUrls);
+        console.log('i am special');
         this.setState({selectedRows})
     }
     // 
-
     render(){
         // const { role, username } = this.props.userinfo;
         // console.log('this.props.userinfo', this.props.userinfo);
