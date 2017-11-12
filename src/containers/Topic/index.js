@@ -23,7 +23,7 @@ class Topic extends React.Component{
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
         this.state = {
             ids: [],  // 通过修改id的值，触发专贴事件的刷新
-            urls: [],
+            selectedRows: [],
         }
     }
     componentDidMount() {
@@ -43,23 +43,18 @@ class Topic extends React.Component{
     }
     // ids 单一功能原则
     // 专贴选择
-    modifyIdsAction(newID) {
+    modifyIdsAction(ids) {
     // 通过修改id的值，触发专贴事件的刷新
         // let { ids } = this.state;
         // console.log('newId', newID);
-        this.setState({
-            ids: newID
-        })
+        this.setState({ids})
     }
     // 事件列表选择
-    modifyUrlsAction(newUrls, targetId) {
-    // urls 与图表绑定
+    modifyUrlsAction(selectedRows) {
         // console.log('newUrls', newUrls);
-
-        this.setState({
-            urls: newUrls
-        })
+        this.setState({selectedRows})
     }
+    // 
 
     render(){
         // const { role, username } = this.props.userinfo;
@@ -67,16 +62,24 @@ class Topic extends React.Component{
         const userinfo = this.props.userinfo;
         const role = userinfo.role;
         const username = userinfo.username;
+        // 筛选出选中urls
+        const urls = this.state.selectedRows.map((item, index)=>item.url);
         // console.log('username',username);
         // const testUrls = ["http://tieba.baidu.com/p/5335559380","http://tieba.baidu.com/p/5347033044","http://tieba.baidu.com/p/5345718981"];
         return(
             <div>
-                <Header user= { username } role={ role } selectedKeys='topic'/> { /* 头部 */}
-                <DataExhibition urls={this.state.urls} token={this.props.userinfo.token} dynamic={true} />  { /* 图表 */}
+                <Header 
+                    selectedRows={this.state.selectedRows|| []}
+                    user= { username } 
+                    role={ role } 
+                    selectedKeys='topic'/> { /* 头部 */}
+                <DataExhibition 
+                    urls={urls} 
+                    token={this.props.userinfo.token} dynamic={true} />  { /* 图表 */}
                 <Row id='topicDataListContainer' gutter={16}>
                     <Col span={8} className="gutter-row">
                         <TopicList
-                            onUrls={this.state.urls}
+                            onUrls={urls}
                             modifyIds={this.modifyIdsAction.bind(this)}
                             token={this.props.userinfo.token} />
                     </Col>

@@ -1,7 +1,7 @@
 import  React from 'react';
 import { Link, hashHistory } from 'react-router';
 import PureRenderMixin from 'react-addons-pure-render-mixin'
-import { Menu, Icon, Button, Dropdown, Modal, Tabs } from 'antd';
+import { Menu, Icon, Button, Dropdown, Modal, Tabs, message } from 'antd';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -26,7 +26,7 @@ import './style.less'
 class Head extends React.Component{
     constructor(props, context){
         super(props, context);
-        // this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+        this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
         this.state = {
             current: this.props.selectedKeys,  // 默认选择页
             privilege: false,
@@ -41,9 +41,7 @@ class Head extends React.Component{
     componentDidMount() {
         const role = this.props.role;
         // console.log('this.props' ,this.props);
-        
-        console.log('NODE_ENV', __DEV__);
-
+        // console.log('NODE_ENV', __DEV__);
         if (role === 'ADMIN') {
             this.setState({privilege: true})
         }
@@ -52,7 +50,7 @@ class Head extends React.Component{
     handleDiffPage(e){ 
         console.log('click ', e.key);
         hashHistory.push(e.key);
-        this.setState({
+        this.setState({ 
           current: e.key,
         });
     }
@@ -69,35 +67,69 @@ class Head extends React.Component{
         this.props.userinfoAction.logout({});
         hashHistory.push('login');
     }
+    // 生成专报
+    handleDownLoadTopicReport() {
+        console.log('this.props.selectedRows', this.props.selectedRows);
+        // fetch 
+        // deal fetch-return-promise
+        message.info('下载专报功能暂未开放');
+    }
     // 生成报表
     handleDownLoadReport() { 
+        const { reportDate } = this.state;
         this.setState({
             isDownLoadReport: true
         })
         let { token } = this.props.userinfo; 
-        let result = downLoadReport( token );
+        let result = downLoadReport( token, reportDate );
         result.then(resp =>{
             if (resp.ok) {
-                return resp.text()
+                return resp.blob()
+            } else {
+                message.error('该月份月报暂未生成');
             }
-        }).then(text => {
-            const { reportDate } = this.state;
-            let _a = document.createElement('a');
-            const url = `/event/report/${reportDate.year}/${reportDate.month}?permission=${text}`;
-            const filename = `西南石油大学${reportDate.year}年${reportDate.month-1}-${reportDate.month}月舆情报表`;
-            console.log('url', url);
-            _a.setAttribute('href', url);
-            _a.setAttribute('download', filename);
-            _a.click();
-            console.log(_a);
-            _a = null;
-            this.setState({
-                isDownLoadReport: false
-            })
+        }).then(blob => {
+            console.log(blob);
+            // 兼容FF
+            const isFF = false;
+            let url = window.URL.createObjectURL(blob);
+            console.log('primary url', url);
+            if (isFF) {
+                window.open(blob);
+                URL.revokeObjectURL(url);
+            } else {
+                let _a = document.createElement('a');
+                const filename = `西南石油大学${reportDate.year}年${reportDate.month-1}-${reportDate.month}月舆情报表.doc`;
+                _a.href = url ;
+                _a.download = filename;
+                document.body.appendChild(_a); // 兼容FF
+                _a.click();
+                document.body.removeChild(_a); // 兼容FF
+                // 释放文件引用
+                URL.revokeObjectURL(url);
+                // 解除等待状态
+                this.setState({
+                    isDownLoadReport: false,
+                })
+            }
+            // const url = `/event/report/${reportDate.year}/${reportDate.month}?permission=${text}`;
+            // console.log('url', url);
+            // _a.setAttribute('href', url);
+            // _a.setAttribute('download', filename);
+            // _a.click();
+            // console.log(_a);
+            // _a = null;
+            // this.setState({
+            //     isDownLoadReport: false
+            // })
         }).catch(ex => {
             if (__DEV__) {
                 console.log('下载报表出错 ', ex.message);
             }
+            // message.info('下载报表功能暂未开放');
+            this.setState({
+                isDownLoadReport: false,
+            })
         })
         // /event/report/2017/3?permission=db2501df6a994728"
         // /event/report/2017/9?permission=e5a4968e40ec49e3
@@ -126,29 +158,37 @@ class Head extends React.Component{
         })
     }
     render(){
-
+        const { role, username, token} = this.props.userinfo;
+        const { privilege, current } = this.state;
+        const { selectedRows : selectedRows4Topic } = this.props;
         return(
             <div id='header-container'>
 
             {/* 用户信息 */}
-                <User handleDownLoadReport={this.handleDownLoadReport.bind(this)}   // 下载报表
+                <User 
+                 selectedRows4Topic={selectedRows4Topic}
+                 handleDownLoadReport={this.handleDownLoadReport.bind(this)}   // 下载报表
+                 handleDownLoadTopicReport={this.handleDownLoadTopicReport.bind(this)}
                  isDownLoadReport={this.state.isDownLoadReport} // 是否在下载报表
-                 role={this.props.role}  //  角色权限
-                 username={this.props.user}  // 角色名字
-                 privilege={this.state.privilege} // 角色是否拥有最高权限
+                 role={role}  //  角色权限
+                 username={username}  // 角色名字
+                 privilege={privilege} // 角色是否拥有最高权限
                  handleDisconneted={this.handleDisconneted.bind(this)} // 注销
                  handleChangeReportDateAction={this.handleChangeReportDate.bind(this)} // 改变月报月份
-                 handleRightCom={this.handleRightCom.bind(this)}/> {/* 权限管理 */}
+                 handleRightCom={this.handleRightCom.bind(this)} // 权限管理 
+                 current={current}/> {/* 当前选中 */}
 
             {/* 导航 */}
-                <Category current={this.state.current}  // 默认选中 
-                changePage={this.handleDiffPage.bind(this)}/>  {/*改变页面时*/}
+                <Category 
+                 current={current}  // 默认选中 
+                 changePage={this.handleDiffPage.bind(this)}/>  {/*改变页面时*/}
 
             {/* 權限管理*/}
-                <PriManage visible={this.state.visible} // 弹窗是否可见 
-                onCancle={this.handleHideMode.bind(this)} // 取消 
-                token={this.props.userinfo.token}
-                username={this.props.userinfo.username}/> 
+                <PriManage 
+                 visible={this.state.visible} // 弹窗是否可见 
+                 onCancle={this.handleHideMode.bind(this)} // 取消 
+                 token={token}
+                 username={username}/> 
                 
 
             </div>

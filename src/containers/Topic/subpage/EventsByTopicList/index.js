@@ -159,11 +159,11 @@ class EventsByTopicList extends React.Component{
       console.log('this.state.data', this.state.data);
 
       if (selectedRowKeys.length <= 5) {
-        let urls = selectedRows.map((item, indxe)=>item.url);
+        // let urls = selectedRows.map((item, indxe)=>item.url);
         // 勾选动作
         this.setState({selectedRowKeys});
         // 更新选中折线
-        this.updataUrls(urls);
+        this.updataUrls(selectedRows);
       } else {
         message.error('至多选择五条');
       }

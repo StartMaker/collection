@@ -1,7 +1,7 @@
 import  React from 'react';
 import { Link } from 'react-router';
 import PureRenderMixin from 'react-addons-pure-render-mixin'
-import { Menu, Icon, Button, Dropdown, DatePicker  } from 'antd';
+import { Menu, Icon, Button, Dropdown, DatePicker, Popconfirm } from 'antd';
 import moment from 'moment';
 
 moment.locale('zh-cn');
@@ -21,6 +21,9 @@ class User extends React.Component{
     DownLoad() {
         this.props.handleDownLoadReport();
     }
+    DownLoadTopic() {
+        this.props.handleDownLoadTopicReport();
+    }
     Disconneted() {
         this.props.handleDisconneted();
     }
@@ -30,6 +33,20 @@ class User extends React.Component{
     mouthChange(data, dateString) {
       this.props.handleChangeReportDateAction(dateString.slice(0, 4), dateString.slice(5));
         // console.log('selected month', data, dateString); 
+    }
+    sureDownloadTitle() {
+        const selectedRows = this.props.selectedRows4Topic;
+        return (
+        <div>
+            <p>你的专报包含以下专贴：</p>
+            <p id='topic-confirm-pop-wrap'>{
+                selectedRows.map((item, index)=>(
+                    <p className='topic-confirm-pop-item' key={index}><Icon type="tag" />{item.theme}</p>
+                ))
+            }</p>
+            <p>是否生成？</p>
+        </div>
+        )
     }
     render(){
     const menu = (
@@ -46,7 +63,6 @@ class User extends React.Component{
     )
         return(
             <div id='head-userinfo'>
-                <p>
                     <Dropdown overlay={menu} placement="bottomLeft">
                         <span>
                             <Icon type="user" style={{ fontSize: 16, color: '#08c', paddingRight: 5 }} />
@@ -55,6 +71,19 @@ class User extends React.Component{
                         </span>
                     </Dropdown>
                     <span className='head-reporter'>
+                     {
+                        this.props.current=='topic'? 
+                        <Popconfirm
+                            title={this.sureDownloadTitle()}
+                            onConfirm={this.DownLoadTopic.bind(this)}> 
+                            <Button
+                            disabled={this.props.selectedRows4Topic.length>0? false: true}
+                            icon='exception'
+                            loading={this.props.isDownLoadReport}>
+                                生成专报
+                            </Button>
+                        </Popconfirm>
+                        :<p> 
                       <MonthPicker
                         disabled={this.props.isDownLoadReport}
                         className='head-monthpicker' 
@@ -66,8 +95,9 @@ class User extends React.Component{
                         icon='exception' 
                         loading={this.props.isDownLoadReport}
                         onClick={this.DownLoad.bind(this)} >生成报表</Button>
+                        </p>
+                     }
                     </span>
-                </p>
             </div>
 
         )

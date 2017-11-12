@@ -29,7 +29,7 @@ class DailyDataList extends React.Component{
             sumPage: 0,
             visible: false,
             currentCowData: {},
-            loading: false
+            loading: false,
         };
         // 表头
         this.columns = [{
@@ -48,13 +48,13 @@ class DailyDataList extends React.Component{
             width: '35%',
             className: 'column-font',
         },{
-            title: '更贴量',
+            title: '跟贴量',
             dataIndex: 'followCount',
         },{
             title: '类别',    // 可修改
             dataIndex: 'postType',
         },{
-            title: '最后更贴时间',
+            title: '最后跟贴时间',
             dataIndex: 'lastFollowTime',
         },{
             title: '发帖时间',
@@ -273,7 +273,6 @@ class DailyDataList extends React.Component{
                     handleConnection={this.handleConnectionAction.bind(this)} />
                  </Modal>
             </div>
-
         )
     }
 }
