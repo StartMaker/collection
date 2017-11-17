@@ -30,6 +30,7 @@ class DailyDataList extends React.Component{
             visible: false,
             currentCowData: {},
             loading: false,
+            more: 0,
         };
         // 表头
         this.columns = [{
@@ -76,6 +77,7 @@ class DailyDataList extends React.Component{
 
     }
     componentDidMount() {
+        //  获取列表信息
         this.getDataListByPage(1);
         this.getDailyDataSumPageAction();
     }
@@ -87,7 +89,8 @@ class DailyDataList extends React.Component{
         }
     }   
     // 获取总页数
-    getDailyDataSumPageAction(more=0) {
+    getDailyDataSumPageAction() {
+        let { more } = this.state;
         let { token } = this.props;
         let result = getDailyDataSumPage({
             more: more
@@ -98,7 +101,7 @@ class DailyDataList extends React.Component{
             }
         }).then(text => {
             this.setState({
-                sumPage: text
+                sumPage: parseInt(text, 10)
             })
         }).catch(ex => {
             console.log(ex.message);
@@ -140,7 +143,7 @@ class DailyDataList extends React.Component{
         }
     }
     // 获取指定页数的数据
-    getDataListByPage(page, more=0, refresh=false) {
+    getDataListByPage(page, refresh=false) {
         //  从缓存中读取数据
         let cacheIndex = this.checkCache(page);
         if (cacheIndex >= 0 && !refresh) {
@@ -151,6 +154,7 @@ class DailyDataList extends React.Component{
             console.log('cache');
             return;
         }
+        let { more } = this.state;
         // 加载中
         this.setState({ 
             loading: true
@@ -213,6 +217,7 @@ class DailyDataList extends React.Component{
             })        
         }
     }
+
     // 归集
     handleConnectionAction(info) {
         const { user, token } = this.props;
@@ -237,7 +242,7 @@ class DailyDataList extends React.Component{
         }).then(text =>{
             if (text=== '归集成功') {
                 message.success('归集成功！');
-                this.getDataListByPage(this.state.currentPage, 0, true);
+                this.getDataListByPage(this.state.currentPage, true);
             } else {
                 message.error(`归集失败！${text}`);
             }
@@ -247,12 +252,31 @@ class DailyDataList extends React.Component{
             }
         })
     }
+    onShowSizeChange(current, size) {
+        console.log('current, size',current, size);
+
+        this.setState({more: (size - 5)}, ()=> {
+            cacheData = [];
+            this.getDataListByPage(this.state.currentPage);
+            this.getDailyDataSumPageAction();
+        });
+    }
     render(){
+        const { sumPage, more } = this.state;
+        const currentSize = 5 + more;
         return(
             <div className='container-flex tableWrap'>
                 <p className='section-header'>全部舆情事件</p>
                 <TableWrap
                 {...this.state}
+                onShowSizeChange={this.onShowSizeChange.bind(this)}
+                pagination={{
+                    showQuickJumper: true,
+                    showSizeChanger: true,
+                    pageSizeOptions: ['5', '10', '15', '20'],
+                    total: sumPage * currentSize ,
+                    pageSize: currentSize,
+                }}
                 columns={this.columns}
                 clickOtherPageAction={this.otherPageAction.bind(this)}/>
 

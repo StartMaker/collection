@@ -30,7 +30,6 @@ var urlBody = {       // 筛选请求参数
     isHandled: 2,
     isFeedBack: 2,
     isAll: true,
-    more: 0
 };
 
 class HandleDataList extends React.Component{
@@ -42,6 +41,7 @@ class HandleDataList extends React.Component{
             currentPage: 1,
             data: [],  
             sumPage: 0,
+            more: 0,
             currentCowData: {},  // 选中的行info
             loading: false,    
             selectedRowKeys: [], // 删除选择行的keys
@@ -164,7 +164,7 @@ class HandleDataList extends React.Component{
         console.log('cacheData', cacheData);
     }
     // 获取指定页数的数据
-    getDataListByPage(page, more=0, refresh=false) {
+    getDataListByPage(page, refresh=false) {
         //  从缓存中读取数据
         let cacheIndex = this.checkCache(page);
         if (cacheIndex >= 0 && !refresh) {
@@ -182,10 +182,11 @@ class HandleDataList extends React.Component{
             selectedRowKeys: [] // 清空选择
         })
         // fetch
+        let { more } = this.state;
         let { token } = this.props;
         let result = getHandleDataList({
             url: page,
-            body: urlBody
+            body: Object.assign({}, urlBody, { more: more}),
         }, token, fetchType.FETCH_TYPE_GET_URL2PARAMS);
         // 处理返回的promise对象
         result.then(resp => {
@@ -293,6 +294,14 @@ class HandleDataList extends React.Component{
             currentCowData: info
         })
     }
+    onShowSizeChange(current, size) {
+        this.setState({
+            more: (size - 5),
+        }, () => {
+            cacheData = [];
+            this.getDataListByPage(this.state.currentPage);
+        })
+    }
     render(){
         // 选择框
         const rowSelection = {
@@ -364,7 +373,8 @@ class HandleDataList extends React.Component{
             title: '具体处置',
             dataIndex: 'detail',
         }];
-
+        let { more, sumPage } = this.state;
+        const currentSize = 5 + more;
         return(
             <div className='container-flex tableWrap'>
                 <p className='section-header'>
@@ -378,6 +388,14 @@ class HandleDataList extends React.Component{
                 <TableWrap
                 handleDoubleClickRow={ this.handleDoubleClickRowAction.bind(this) }
                 {...this.state}
+                onShowSizeChange={this.onShowSizeChange.bind(this)}
+                pagination={{
+                    showQuickJumper: true,
+                    showSizeChanger: true,
+                    pageSizeOptions: ['5', '10', '15', '20'],
+                    total: sumPage * currentSize,
+                    pageSize: currentSize,
+                }}
                 rowSelection={rowSelection}
                 columns={columns}
                 clickOtherPageAction={this.otherPageAction.bind(this)}/>
