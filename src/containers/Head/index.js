@@ -14,7 +14,7 @@ import PriManage from '../PriManage';
 import Category from '../../components/Category';
 import User from './subpage';
 import downLoadReport from '../../fetch/downLoadReport';
-
+import downLoadTopicReport from '../../fetch/downLoadSpecialReport';
 
 const MenuItemGroup = Menu.ItemGroup;
 
@@ -69,10 +69,32 @@ class Head extends React.Component{
     }
     // 生成专报
     handleDownLoadTopicReport() {
-        console.log('this.props.selectedRows', this.props.selectedRows);
+        const { selectedRows } = this.props;
+        console.log('this.props.selectedRows', selectedRows);
         // fetch 
+        let { token } = this.props.userinfo;
+        this.setState({
+            isDownLoadReport: true
+        })
+        let result = downLoadTopicReport(token, selectedRows.map((item, index) => item.url));
         // deal fetch-return-promise
-        message.info('下载专报功能暂未开放');
+        result.then(resp => {
+            if (resp.ok) {
+                return resp.blob()
+            } else {
+                message.error('专报生成失败');
+            }
+        }).then(blob => {
+            this.downloadFile(blob, "专报");
+        }).catch(ex => {
+            if (__DEV__) {
+                console.log(ex.message);
+            }
+            this.setState({
+                isDownLoadReport: false,
+            })
+        })
+        // message.info('下载专报功能暂未开放');
     }
     // 生成报表
     handleDownLoadReport() { 
@@ -89,39 +111,8 @@ class Head extends React.Component{
                 message.error('该月份月报暂未生成');
             }
         }).then(blob => {
-            console.log(blob);
-            // 兼容FF
-            const isFF = false;
-            let url = window.URL.createObjectURL(blob);
-            console.log('primary url', url);
-            if (isFF) {
-                window.open(blob);
-                URL.revokeObjectURL(url);
-            } else {
-                let _a = document.createElement('a');
-                const filename = `西南石油大学${reportDate.year}年${reportDate.month-1}-${reportDate.month}月舆情报表.doc`;
-                _a.href = url ;
-                _a.download = filename;
-                document.body.appendChild(_a); // 兼容FF
-                _a.click();
-                document.body.removeChild(_a); // 兼容FF
-                // 释放文件引用
-                URL.revokeObjectURL(url);
-                // 解除等待状态
-                this.setState({
-                    isDownLoadReport: false,
-                })
-            }
-            // const url = `/event/report/${reportDate.year}/${reportDate.month}?permission=${text}`;
-            // console.log('url', url);
-            // _a.setAttribute('href', url);
-            // _a.setAttribute('download', filename);
-            // _a.click();
-            // console.log(_a);
-            // _a = null;
-            // this.setState({
-            //     isDownLoadReport: false
-            // })
+            const filename = `西南石油大学${reportDate.year}年${reportDate.month-1}-${reportDate.month}月舆情报表.doc`;
+            this.downloadFile(blob, filename);
         }).catch(ex => {
             if (__DEV__) {
                 console.log('下载报表出错 ', ex.message);
@@ -131,13 +122,6 @@ class Head extends React.Component{
                 isDownLoadReport: false,
             })
         })
-        // /event/report/2017/3?permission=db2501df6a994728"
-        // /event/report/2017/9?permission=e5a4968e40ec49e3
-        // setTimeout(function(){
-        // this.setState({
-        //     isDownLoadReport: false
-        // })
-        // }.bind(this), 1500)
     }
     // 月报月份
     handleChangeReportDate(year, month) {
@@ -156,6 +140,27 @@ class Head extends React.Component{
         this.setState({
             visible: false
         })
+    }
+    // 文件下载
+    downloadFile(blob, fileName) {
+        // console.log(blob);
+            // 兼容FF
+            // const isFF = false;
+            let url = window.URL.createObjectURL(blob);
+            // console.log('primary url', url);
+            let _a = document.createElement('a');
+
+            _a.href = url ;
+            _a.download = fileName;
+            document.body.appendChild(_a); // 兼容FF
+            _a.click();
+            document.body.removeChild(_a); // 兼容FF
+            // 释放文件引用
+            URL.revokeObjectURL(url);
+            // 解除等待状态
+            this.setState({
+                isDownLoadReport: false,
+            })
     }
     render(){
         const { role, username, token} = this.props.userinfo;
