@@ -73,7 +73,9 @@ class Head extends React.Component{
         console.log('this.props.selectedRows', selectedRows);
         // fetch 
         let { token } = this.props.userinfo;
-        
+        this.setState({
+            isDownLoadReport: true
+        })
         let result = downLoadTopicReport(token, selectedRows.map((item, index) => item.url));
         // deal fetch-return-promise
         result.then(resp => {
