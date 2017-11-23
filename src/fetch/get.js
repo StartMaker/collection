@@ -30,12 +30,12 @@ export default function get(url, params, token) {
     }
     // console.log('params', params);
     let proToken = 'Bearer ' + token;
-    var result = fetch(urlWithUrl || url, {
+    
+    return fetch(urlWithUrl || url, {
         headers: {
             'Accept': 'application/json, text/plain, */*',
             'Authorization': proToken
         },
         mode: 'cors',
     })
-    return result;
 }

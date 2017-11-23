@@ -1,9 +1,9 @@
-import get from '../get';
+import post from '../post';
 
 
 export default function downLoadSpecialReport(token, body) {
-    let url = `/event/report/postReport/${body.year}/${body.month}`;
-    const result = get(url, "", token);
+    let url = `/event/report/postReport`;
+    const result = post(url, body, token);
     return result;
 }
 

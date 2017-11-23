@@ -9,8 +9,8 @@ export default function post( ...args ) {
     const params = JSON.stringify(body);
     // console.log(params);
     let proToken = 'Bearer ' + token;
-    var result = null ;
-    result = fetch(url, {
+    
+    return fetch(url, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -20,5 +20,4 @@ export default function post( ...args ) {
         },
         body: params
     });
-    return result
 }

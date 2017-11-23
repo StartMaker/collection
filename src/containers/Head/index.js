@@ -74,7 +74,7 @@ class Head extends React.Component{
         // fetch 
         let { token } = this.props.userinfo;
         
-        let result = downLoadTopicReport(token, {ids: selectedRows.map((item, index) => item.id)});
+        let result = downLoadTopicReport(token, selectedRows.map((item, index) => item.url));
         // deal fetch-return-promise
         result.then(resp => {
             if (resp.ok) {
@@ -92,7 +92,7 @@ class Head extends React.Component{
                 isDownLoadReport: false,
             })
         })
-        message.info('下载专报功能暂未开放');
+        // message.info('下载专报功能暂未开放');
     }
     // 生成报表
     handleDownLoadReport() { 
